@@ -1,39 +1,43 @@
-<div id="registration-management">
-  <div id="top">
-    <h4>Registration Management</h4>
+<div id="custom-settings">
+  <link rel="stylesheet" href="https://mariannekenney.github.io/penguin/style.scss">
 
-    <div id="select-event">
-      <select id="dropdown"></select>
+  <div id="registration-management">
+    <div id="top">
+      <h4>Registration Management</h4>
+
+      <div id="select-event">
+        <select id="dropdown"></select>
+      </div>
+
+      <button id="save" onclick="onSaveData()">SAVE</button>
     </div>
 
-    <button id="save" onclick="onSaveData()">SAVE</button>
-  </div>
+    <div id="loader-container" style="display: none">
+      <div class="loader"></div>
+    </div>
 
-  <div id="loader-container" style="display: none">
-    <div class="loader"></div>
-  </div>
-
-  <div id="content">
-    <br>
-    <table id="management-table">
-      <colgroup>
-        <col>
-        <col style="width: 30%">
-        <col style="width: 20%">
-        <col style="width: 10%">
-        <col style="width: 10%">
-      </colgroup>
-      <thead>
-        <tr>
-          <th>Name</th>
-          <th>Option</th>
-          <th>Sub Option</th>
-          <th>Limit</th>
-          <th>Registered</th>
-        </tr>
-      </thead>
-      <tbody id="table-body"></tbody>
-    </table>
-    <br>
+    <div id="content">
+      <br>
+      <table id="management-table">
+        <colgroup>
+          <col>
+          <col style="width: 30%">
+          <col style="width: 20%">
+          <col style="width: 10%">
+          <col style="width: 10%">
+        </colgroup>
+        <thead>
+          <tr>
+            <th>Name</th>
+            <th>Option</th>
+            <th>Sub Option</th>
+            <th>Limit</th>
+            <th>Registered</th>
+          </tr>
+        </thead>
+        <tbody id="table-body"></tbody>
+      </table>
+      <br>
+    </div>
   </div>
 </div>
