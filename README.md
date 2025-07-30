@@ -36,7 +36,7 @@ This repository contains custom frontend work completed for the Penguin Racing S
 
 The custom frontend code is organized within a `src` folder, structured as follows:
 
-- `style.scss` — The main stylesheet  
+- `style.css` — The main stylesheet  
 - `site/` — Contains JavaScript and HTML files related to *site pages* (pages managed by Penguin)  
 - `system/` — Contains JavaScript and HTML files related to *system pages* (pages managed by Wild Apricot)  
 
