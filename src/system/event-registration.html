@@ -1,0 +1,376 @@
+<div id="event-registration">
+  <link rel="stylesheet" href="https://mariannekenney.github.io/penguin/src/site/style.scss">
+
+  <div id="loader-container" style="display: none">
+    <div class="loader"></div>
+  </div>
+
+  <dialog class="custom-modal" id="waitlist">
+    <div class="modal-content">
+      <h4>Join the Waitlist</h4>
+      <div id="inner-content">
+        <p id="message"><span style="font-style: italic">Select Sold Out Class:</span></p>
+        <div id="options"></div>
+        <button class="modal-button" id="complete">Submit</button>
+        <button class="modal-button" id="cancel">Cancel</button>
+      </div>
+      <div id="loader-container" style="display: none">
+        <div class="loader"></div>
+      </div>
+    </div>
+  </dialog>
+
+  <dialog class="custom-modal" id="cancellation">
+    <div class="modal-content">
+      <div class="gadgetStyleBody gadgetContentEditableArea" style="" data-editablearea="0" data-areaheight="auto">
+        <p><span>
+            <font color="#000000" face="verdana, arial, sans-serif"><span>
+                <font><strong>
+                    <font style="font-size: 18px;">Cancellation and Rain/No Show Protection</font>
+                  </strong><br></font>
+              </span></font>
+          </span></p>
+
+        <p style="display: inline !important;">
+          <font color="#000000" face="verdana, arial, sans-serif">
+            <font>
+              <font><strong><u>Penguin runs rain or shine</u></strong>, and we&nbsp;<span
+                  class="Apple-style-span">encourage</span>&nbsp;riders to try a rain course at some point during their
+                track
+                experience. It's a fantastic way to focus on proper technique and can serve as an excellent learning
+                tool.
+                &nbsp;In recent years we've updated our cancellation policies in order to give riders better options in
+                the
+                event that they need to cancel an event reservation for any reason.&nbsp; Registering early saves money
+                and
+                guarantees your spot (or your rental bike).</font>
+            </font>
+          </font>
+        </p>
+
+        <div>
+          <p>
+            <font color="#000000"><span><br>
+                <span class="Apple-style-span">
+                  <font><span><strong>
+                        <font face="verdana, arial, sans-serif" style="text-decoration-line: underline;"><strong>
+                            <font face="verdana, arial, sans-serif" color="#000000">Tuition&nbsp;</font>
+                          </strong>Rain/No Show Protection</font>
+                        <font face="verdana, arial, sans-serif, WaWebKitSavedSpanIndex_7"><span
+                            class="Apple-style-span">&nbsp;</span>(</font><span
+                          style="background-color: rgb(255, 255, 0);">
+                          <font color="#000000" face="verdana, arial, sans-serif"
+                            style="font-family: verdana, arial, sans-serif;">This benefit is&nbsp;<strong>automatically
+                              included</strong></font>
+                        </span>
+                        <font color="#000000" face="verdana, arial, sans-serif"
+                          style="font-family: verdana, arial, sans-serif;"><span
+                            style="background-color: rgb(255, 255, 0);"><span>&nbsp;for&nbsp;<a
+                                href="/Learn-to-Fly-PLUS">LTF
+                                Plus Members</a></span></span>)</font>
+                      </strong></span></font>
+                </span><span class="Apple-style-span">
+                  <font><br></font>
+                </span></span>
+              <font style="font-family: verdana, arial, sans-serif;">This option is available for most events for $25
+                and
+                is
+                available for all registrations 10 or more days in advance of the event.&nbsp;</font>
+              <font>
+                <font face="verdana, arial, sans-serif">&nbsp; For $25, riders get a 90% tuition transfer credit if they
+                  do
+                  not show up at an event for ANY reason.&nbsp; No notice is needed, and the credit will be issued
+                  within
+                  5
+                  days of the event.&nbsp; <span style="background-color: rgb(255, 255, 0);"><span>Riders should notify
+                      Penguin by email no later than 48 hours after the event to claim their credit.</span></span>&nbsp;
+                  Register early and save!&nbsp;&nbsp;</font><br>
+                <br>
+                <strong><u>
+                    <font face="verdana, arial, sans-serif">Bike Rental Rain</font>
+                    <font face="verdana, arial, sans-serif, WaWebKitSavedSpanIndex_9">&nbsp;Protection</font>
+                  </u></strong>
+                <font face="verdana, arial, sans-serif">&nbsp;Motorcycle Rentals have a separate Rain Insurance Policy
+                  for
+                  $50.&nbsp; If you are renting a bike, you need to select "Rain insurance with bike Rental" in order to
+                  cover
+                  the bike rental.&nbsp; Cancellations less than 10 days from the event give the insurance holder 90%
+                  credit
+                  on the rental fee.</font>
+              </font>
+            </font>
+          </p>
+
+          <p>
+            <font color="#000000">
+              <font style="font-family: verdana, arial, sans-serif; font-size: 24px;"><strong><u>Tuition</u> Rain/No
+                  Show
+                  Protection (automatic for LTF Plus members)</strong></font>
+            </font>
+          </p>
+
+          <table width="99%" cellpadding="0" cellspacing="0" watable="1" class="contStyleExcSimpleTable"
+            style="border-collapse: collapse; border-style: solid; border-width: 1px; border-color: rgb(153, 153, 153);">
+            <tbody>
+              <tr>
+                <td style="border-style: solid; border-width: 1px; border-color: rgb(153, 153, 153);" width="" height=""
+                  align="center">
+                  <font style="font-size: 14px;">&nbsp;<strong>
+                      <font>Time before event</font>
+                    </strong></font>
+                </td>
+
+                <td
+                  style="border-style: solid; border-width: 1px; border-color: rgb(153, 153, 153); background-color: rgb(204, 255, 153);"
+                  width="" height="" align="center"><strong>
+                    <font>
+                      <font style="font-size: 18px;">&nbsp;</font>
+                      <font color="#1A7B30" style="font-size: 24px;">With</font>&nbsp;$25/day&nbsp;<font
+                        style="font-size: 18px;">Rain-No Show Protection</font>
+                    </font>
+                  </strong></td>
+
+                <td
+                  style="border-style: solid; border-width: 1px; border-color: rgb(153, 153, 153); background-color: rgb(255, 153, 0);"
+                  width="" height="" align="center"><strong>
+                    <font style="font-size: 18px;">&nbsp;<font color="#000000">Without</font>&nbsp;Rain-No Show
+                      Protection
+                    </font>
+                  </strong></td>
+              </tr>
+
+              <tr>
+                <td style="border-style: solid; border-width: 1px; border-color: #999999;" width="" height="" align="">
+                  &nbsp;
+                </td>
+
+                <td
+                  style="border-style: solid; border-width: 1px; border-color: rgb(153, 153, 153); background-color: rgb(204, 255, 153);"
+                  width="" height="" align="">&nbsp;</td>
+
+                <td
+                  style="border-style: solid; border-width: 1px; border-color: rgb(153, 153, 153); background-color: rgb(255, 153, 0);"
+                  width="" height="" align="">&nbsp;</td>
+              </tr>
+
+              <tr>
+                <td style="border-style: solid; border-width: 1px; border-color: #999999;" width="" height="" align="">
+                  &nbsp;<strong>10 or more&nbsp;Days</strong></td>
+
+                <td
+                  style="border-style: solid; border-width: 1px; border-color: rgb(153, 153, 153); background-color: rgb(204, 255, 153);"
+                  valign="top"><span>
+                    <font>&nbsp; Full PRS Credit or Refunds&nbsp;<span style="background-color: rgb(204, 255, 153);">(5%
+                        processing fee)</span> available</font>
+                  </span></td>
+
+                <td
+                  style="border-style: solid; border-width: 1px; border-color: rgb(153, 153, 153); background-color: rgb(255, 153, 0);"
+                  valign="top"><span>
+                    <font>&nbsp; Refunds or credits available (5% processing fee)</font>
+                  </span></td>
+              </tr>
+
+
+
+              <tr>
+                <td style="border-style: solid; border-width: 1px; border-color: #999999;" width="" height="" align="">
+                  &nbsp;
+                </td>
+
+                <td
+                  style="border-style: solid; border-width: 1px; border-color: rgb(153, 153, 153); background-color: rgb(204, 255, 153);"
+                  valign="top">&nbsp;</td>
+
+                <td
+                  style="border-style: solid; border-width: 1px; border-color: rgb(153, 153, 153); background-color: rgb(255, 153, 0);"
+                  valign="top">&nbsp;</td>
+              </tr>
+
+              <tr>
+                <td style="border-style: solid; border-width: 1px; border-color: #999999;" width="" height="" align="">
+                  &nbsp;<strong>9&nbsp;Days or less</strong></td>
+
+                <td
+                  style="border-style: solid; border-width: 1px; border-color: rgb(153, 153, 153); background-color: rgb(204, 255, 153);"
+                  valign="top">&nbsp; 90% Penguin Account transfer credit available</td>
+
+                <td
+                  style="border-style: solid; border-width: 1px; border-color: rgb(153, 153, 153); background-color: rgb(255, 153, 0);"
+                  valign="top">&nbsp; <strong>No credits or refunds available</strong></td>
+              </tr>
+
+              <tr>
+                <td style="border-style: solid; border-width: 1px; border-color: #999999;" width="" height="" align="">
+                  &nbsp;
+                </td>
+
+                <td
+                  style="border-style: solid; border-width: 1px; border-color: rgb(153, 153, 153); background-color: rgb(204, 255, 153);"
+                  valign="top">&nbsp;&nbsp;</td>
+
+                <td
+                  style="border-style: solid; border-width: 1px; border-color: rgb(153, 153, 153); background-color: rgb(255, 153, 0);"
+                  valign="top">&nbsp;</td>
+              </tr>
+            </tbody>
+          </table><span><br></span>
+
+          <p>
+            <font color="#000000">
+              <font style="font-family: verdana, arial, sans-serif;"><strong>
+                  <font style="font-size: 24px;"><u>Rental Bike</u> Rain/No Show Protection</font><br>
+                  <font style="font-size: 12px;">
+                    <font style="font-size: 12px;">
+                      <font style="font-size: 12px;">
+                        <font color="#000000">Note:</font>
+                        <font color="#ED1C24">Rental gear (leathers, boots, etc...)</font>
+                        <font color="#000000">is fully refundable (minus a 5% processing fee) for all customers</font>
+                      </font>
+                    </font>
+                  </font>
+                </strong></font>
+            </font>
+          </p>
+
+
+
+          <table width="99%" cellpadding="0" cellspacing="0" watable="1" class="contStyleExcSimpleTable"
+            style="border-collapse: collapse; border-style: solid; border-width: 1px; border-color: rgb(153, 153, 153);">
+            <tbody>
+              <tr>
+                <td style="border-style: solid; border-width: 1px; border-color: rgb(153, 153, 153);" width="" height=""
+                  align="center">
+                  <font style="font-size: 14px;">&nbsp;<strong>
+                      <font>Time before event</font>
+                    </strong></font>
+                </td>
+
+                <td
+                  style="border-style: solid; border-width: 1px; border-color: rgb(153, 153, 153); background-color: rgb(204, 255, 153);"
+                  width="" height="" align="center"><strong>
+                    <font>
+                      <font style="font-size: 18px;">&nbsp;</font>
+                      <font color="#1A7B30" style="font-size: 24px;">With</font>&nbsp;$25/day&nbsp;<font
+                        style="font-size: 18px;">Rain-No Show Protection</font>
+                    </font>
+                  </strong></td>
+
+                <td
+                  style="border-style: solid; border-width: 1px; border-color: rgb(153, 153, 153); background-color: rgb(255, 153, 0);"
+                  width="" height="" align="center"><strong>
+                    <font style="font-size: 18px;">&nbsp;<font color="#000000">Without</font>&nbsp;Rain-No Show
+                      Protection
+                    </font>
+                  </strong></td>
+              </tr>
+
+              <tr>
+                <td style="border-style: solid; border-width: 1px; border-color: #999999;" width="" height="" align="">
+                  &nbsp;
+                </td>
+
+                <td
+                  style="border-style: solid; border-width: 1px; border-color: rgb(153, 153, 153); background-color: rgb(204, 255, 153);"
+                  width="" height="" align="">&nbsp;</td>
+
+                <td
+                  style="border-style: solid; border-width: 1px; border-color: rgb(153, 153, 153); background-color: rgb(255, 153, 0);"
+                  width="" height="" align="">&nbsp;</td>
+              </tr>
+
+              <tr>
+                <td style="border-style: solid; border-width: 1px; border-color: #999999;" width="" height="" align="">
+                  &nbsp;<strong>10 or more&nbsp;Days&nbsp;</strong></td>
+
+                <td
+                  style="border-style: solid; border-width: 1px; border-color: rgb(153, 153, 153); background-color: rgb(204, 255, 153);"
+                  valign="top"><span>
+                    <font>&nbsp; <span>
+                        <font>Full PRS Credit or Refunds&nbsp;<span style="background-color: rgb(204, 255, 153);">(5%
+                            processing fee)</span> available&nbsp;</font>
+                      </span></font>
+                  </span></td>
+
+                <td
+                  style="border-style: solid; border-width: 1px; border-color: rgb(153, 153, 153); background-color: rgb(255, 153, 0);"
+                  valign="top"><span>
+                    <font>&nbsp; Refunds or credits available (minus a 5% processing fee)</font>
+                  </span></td>
+              </tr>
+
+
+
+              <tr>
+                <td style="border-style: solid; border-width: 1px; border-color: #999999;" width="" height="" align="">
+                  &nbsp;
+                </td>
+
+                <td
+                  style="border-style: solid; border-width: 1px; border-color: rgb(153, 153, 153); background-color: rgb(204, 255, 153);"
+                  valign="top">&nbsp;</td>
+
+                <td
+                  style="border-style: solid; border-width: 1px; border-color: rgb(153, 153, 153); background-color: rgb(255, 153, 0);"
+                  valign="top">&nbsp;</td>
+              </tr>
+
+              <tr>
+                <td style="border-style: solid; border-width: 1px; border-color: #999999;" width="" height="" align="">
+                  &nbsp;<strong>9&nbsp;Days or less</strong></td>
+
+                <td
+                  style="border-style: solid; border-width: 1px; border-color: rgb(153, 153, 153); background-color: rgb(204, 255, 153);"
+                  valign="top">&nbsp; 90% Penguin Account transfer credit available</td>
+
+                <td
+                  style="border-style: solid; border-width: 1px; border-color: rgb(153, 153, 153); background-color: rgb(255, 153, 0);"
+                  valign="top">&nbsp; <strong>No credits or refunds available</strong></td>
+              </tr>
+
+              <tr>
+                <td style="border-style: solid; border-width: 1px; border-color: #999999;" width="" height="" align="">
+                  &nbsp;
+                </td>
+
+                <td
+                  style="border-style: solid; border-width: 1px; border-color: rgb(153, 153, 153); background-color: rgb(204, 255, 153);"
+                  valign="top">&nbsp;&nbsp;</td>
+
+                <td
+                  style="border-style: solid; border-width: 1px; border-color: rgb(153, 153, 153); background-color: rgb(255, 153, 0);"
+                  valign="top">&nbsp;</td>
+              </tr>
+            </tbody>
+          </table>
+          <font color="#000000">
+            <font style="font-family: verdana, arial, sans-serif;"><strong>
+                <font style="font-size: 12px;">
+                  <font style="font-size: 12px;"></font>
+                </font>
+              </strong></font>
+          </font><span>&nbsp; &nbsp;&nbsp;</span>
+        </div>
+
+        <div>
+          <ul>
+            <li style="list-style: none; display: inline">
+              <ul></ul>
+            </li>
+          </ul>
+        </div>
+
+        <div>
+          <ul style="line-height: 18px;"></ul><span>
+            <font color="#000000"><strong>To put in a cancellation request, please <a
+                  href="mailto:info@penguinracing.com">email your name &amp; requested date to:
+                  info@penguinracing.com</a>&nbsp;<br>
+                All requests will be responded to and confirmed in 5 days or less.</strong></font>
+          </span>
+        </div>
+      </div>
+    </div>
+
+    <button class="modal-button" id="complete">I Acknowledge and Agree</button>
+  </dialog>
+</div>
