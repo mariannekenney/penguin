@@ -1,23 +1,22 @@
 const labels = Array.from(document.getElementsByClassName('regTypeLiLabel'))
-	.map(element => element.textContent.trim());
+	.map(element => element.textContent.trim())
+	.filter(label => label !== 'Equipment Only');
 
 const groups = {};
 
 labels.forEach(label => {
 	const split = label.split(" ");
-	if (split.length > 2) {
-		const key = `${split[0]} ${split[1]}`;
+	const key = `${split[0]} ${split[1]}`;
 
-		if (groups[key]) {
-			const newSplit = Number(label.split('$')[1]?.split('.')[0]);
-			const existingSplit = Number(groups[key].split('$')[1]?.split('.')[0]);
+	if (groups[key]) {
+		const newSplit = Number(label.split('$')[1]?.split('.')[0]);
+		const existingSplit = Number(groups[key].split('$')[1]?.split('.')[0]);
 
-			if (newSplit < existingSplit) {
-				groups[key] = label;
-			}
-		} else {
+		if (newSplit < existingSplit) {
 			groups[key] = label;
 		}
+	} else {
+		groups[key] = label;
 	}
 });
 

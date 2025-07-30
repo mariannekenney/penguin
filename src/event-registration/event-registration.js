@@ -7,25 +7,24 @@ class RegistrationType {
   execute() {
     // Remove options based on membership / pricing
     const labels = Array.from(document.querySelectorAll('strong.labelTitle.paymentTitle label'))
-      .map(element => element.textContent.trim());
+      .map(element => element.textContent.trim())
+      .filter(label => label !== 'Equipment Only');
 
     const groups = {};
 
     labels.forEach(label => {
       const split = label.split(" ");
-      if (split.length > 2) {
-        const key = `${split[0]} ${split[1]}`;
+      const key = `${split[0]} ${split[1]}`;
 
-        if (groups[key]) {
-          const newSplit = Number(label.split('$')[1]?.split('.')[0]);
-          const existingSplit = Number(groups[key].split('$')[1]?.split('.')[0]);
+      if (groups[key]) {
+        const newSplit = Number(label.split('$')[1]?.split('.')[0]);
+        const existingSplit = Number(groups[key].split('$')[1]?.split('.')[0]);
 
-          if (newSplit < existingSplit) {
-            groups[key] = label;
-          }
-        } else {
+        if (newSplit < existingSplit) {
           groups[key] = label;
         }
+      } else {
+        groups[key] = label;
       }
     });
 
@@ -293,26 +292,27 @@ class RegistrationInfo {
     // When user selects cancellation terms, show popup
     const modal = document.querySelector('.custom-modal#cancellation');
 
-    document.body.addEventListener('click', function (event) {
-      if (event.target && event.target.matches('input[id*="termsOfUseCheckBox"]')) {
-        if (event.target.checked) modal.showModal();
-      }
-    });
+    if (modal) {
+      document.body.addEventListener('click', function (event) {
+        if (event.target && event.target.matches('input[id*="termsOfUseCheckBox"]')) {
+          if (event.target.checked) modal.showModal();
+        }
+      });
 
-    modal.querySelector('.modal-button#complete').addEventListener('click', function (event) {
-      event.preventDefault();
-      modal.close();
-    });
+      modal.querySelector('.modal-button#complete').addEventListener('click', function (event) {
+        event.preventDefault();
+        modal.close();
+      });
+    }
   }
 }
 
-function toggleLoader(display, hideContainer) {
-  if (!hideContainer) {
-    hideContainer = document.querySelector('#idGeneralFormContainer');
-  }
+function toggleLoader(display) {
+  let container = document.querySelector('#idGeneralFormContainer');
+  container.style.display = display ? 'none' : 'block';
 
-  hideContainer.style.display = display ? 'none' : 'block';
-  document.querySelector('#loader-container').style.display = display ? 'flex' : 'none';
+  container = document.querySelector('#loader-container');
+  container.style.display = display ? 'flex' : 'none';
 }
 
 function watchForChanges() {
@@ -324,13 +324,13 @@ function watchForChanges() {
 }
 
 async function insertElements() {
-  let container = document.getElementById('idRegistrationFormContainer')
-    || document.getElementById('idSelectRegistrationTypeContainer')
-    || document.getElementById('idIdentifyUserContainer');
-
   const response = await fetch('https://mariannekenney.github.io/penguin/src/event-registration/event-registration.html');
   const html = await response.text();
-  container.innerHTML = html;
+
+  const container = document.getElementById('idRegistrationFormContainer')
+    || document.getElementById('idSelectRegistrationTypeContainer')
+    || document.getElementById('idIdentifyUserContainer');
+  container.innerHTML += html;
 }
 
 async function handleUserData(token, userData) {
@@ -342,20 +342,10 @@ async function handleUserData(token, userData) {
     const registrationData = await fetchRegistrationData.json();
 
     if (registrationData && registrationData.length == 0) {
-      const alert = document.getElementById('new-user-alert');
-      alert.remove();
-      alert.style.display = 'block';
-
-      document.getElementById('idInfoContainer').after(alert);
+      const container = document.getElementById('idGeneralFormContainer');
+      container.innerHTML = document.getElementById('new-user-alert').innerHTML + container.innerHTML;
     }
   } catch (error) {
-    document.querySelector('#idGeneralFormContainer').style.display = 'none';
-    const alert = document.getElementById('user-login-alert');
-    alert.remove();
-    alert.style.display = 'block';
-
-    document.getElementById('idInfoContainer').after(alert);
-
     console.error('Error fetching user registration data:', error);
   }
 }
@@ -442,8 +432,6 @@ async function fetchRegistrationInfoData(token, eventId, userData) {
   } catch (error) {
     console.error('Error fetching registration info data:', error);
   }
-
-  return Promise.resolve();
 }
 
 async function execute() {
@@ -458,22 +446,25 @@ async function execute() {
 
   if (userData) {
     await handleUserData(token, userData);
-  }
 
-  if (title === 'Choose ticket type') {
-    registrationType = new RegistrationType();
-    registrationType.execute();
+    if (title === 'Choose ticket type') {
+      registrationType = new RegistrationType();
+      registrationType.execute();
 
-    toggleLoader(false);
-  } else if (title === 'Enter registration information') {
-    fetchRegistrationInfoData(token, eventId, userData).then(() => {
       toggleLoader(false);
-    });
+    } else if (title === 'Enter registration information') {
+      await fetchRegistrationInfoData(token, eventId, userData);
+      toggleLoader(false);
+    } else {
+      toggleLoader(false);
+    }
+
+    watchForChanges();
   } else {
     toggleLoader(false);
-  }
 
-  watchForChanges();
+    document.getElementById('idGeneralFormContainer').innerHTML = document.getElementById('user-login-alert').innerHTML;
+  }
 }
 
 execute();

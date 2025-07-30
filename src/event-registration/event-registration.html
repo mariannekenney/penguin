@@ -3,33 +3,49 @@
   <link rel="stylesheet" href="https://mariannekenney.github.io/penguin/src/event-registration/event-registration.css">
 
   <link rel="stylesheet"
-    href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0&icon_names=error" />
+    href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0&icon_names=error,warning" />
 
-  <div id="custom-loader-container" style="display: none">
+  <div id="loader-container" style="display: none">
     <div class="loader"></div>
   </div>
 
-  <div id="user-login-alert" class="custom-alert" style="display: none">
-    <span class="material-symbols-outlined alert-icon">error</span>
-    <div class="alert-content">
-      <h4 class="alert-title">Please log in or create an account to continue</h4>
-      <span>
-        Standard accounts are FREE – or you can join our Learn To Fly membership program for
-        <a href="https://www.penguinracing.com/Member-Programs" target="_blank" class="alert-link">exclusive savings &
-          benefits</a>
-      </span>
-      <a href="https://www.penguinracing.com/Sys/Login" target="_blank" class="alert-button">
+  <div id="user-login-alert" style="display: none">
+    <div class="custom-alert">
+      <div class="alert-content">
+        <span class="material-symbols-outlined alert-icon">error</span>
+        <div class="alert-details">
+          <h4 class="alert-title">Please log in or create an account to continue</h4>
+          <span>
+            Standard accounts are FREE – or you can join our Learn To Fly membership program for
+            <a href="https://www.penguinracing.com/Member-Programs" target="_blank" class="alert-link">exclusive savings
+              &
+              benefits</a>
+          </span>
+        </div>
+      </div>
+      <a href="https://www.penguinracing.com/Sys/Login" class="alert-button">
         Log In / Create Account
       </a>
     </div>
   </div>
 
-  <div id="new-user-alert" class="custom-alert" style="display: none">
-    <h4 class="">New to Penguin?</h4>
-    Review your
-    <a href="https://www.penguinracing.com/Rider-Ability" target="_blank">Rider Ability</a>
-    and check
-    <a href="https://www.penguinracing.com/Equipment-Requirements" target="_blank">Equipment Requirements</a>
+  <div id="new-user-alert" style="display: none">
+    <div class="custom-alert">
+      <div class="alert-content">
+        <span class="material-symbols-outlined alert-icon">warning</span>
+        <div class="alert-details">
+          <h4 class="alert-title">New to Penguin?</h4>
+          <span>
+            Review your
+            <a href="https://www.penguinracing.com/Rider-Ability" target="_blank" class="alert-link">Rider Ability</a>
+            and check
+            <a href="https://www.penguinracing.com/Equipment-Requirements" target="_blank" class="alert-link">Equipment
+              Requirements</a>
+          </span>
+        </div>
+      </div>
+
+    </div>
   </div>
 
   <dialog class="custom-modal" id="waitlist">
