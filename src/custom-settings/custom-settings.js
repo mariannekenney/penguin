@@ -1,7 +1,7 @@
 async function insertHTML() {
   const response = await fetch('https://mariannekenney.github.io/penguin/src/custom-settings/custom-settings.html');
   const html = await response.text();
-  document.querySelector('#custom-gadget-container').innerHTML = html;
+  document.querySelector('.zoneHeader4 .gadgetStyleBody').innerHTML = html;
 }
 
 function toggleLoader(display) {
@@ -268,10 +268,18 @@ function displayTable(tableData) {
       </tr>`;
 
     setTimeout(() => {
-      document.getElementById(`class-${i}`)?.addEventListener('input', function () {
-        this.style.borderColor = '#40b2cf';
-        document.getElementById('save').disabled = false;
-      });
+      const input = document.getElementById(`class-${i}`);
+
+      if (input) {
+        input.addEventListener('input', () => {
+          this.style.borderColor = '#40b2cf';
+          document.getElementById('save').disabled = false;
+        });
+
+        input.addEventListener('wheel', (event) => {
+          event.preventDefault();
+        });
+      }
     }, 0);
   });
 }
