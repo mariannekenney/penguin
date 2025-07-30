@@ -328,7 +328,7 @@ async function insertElements() {
     || document.getElementById('idSelectRegistrationTypeContainer')
     || document.getElementById('idIdentifyUserContainer');
 
-  const response = await fetch('https://mariannekenney.github.io/penguin/src/system/event-registration.html');
+  const response = await fetch('https://mariannekenney.github.io/penguin/src/event-registration/event-registration.html');
   const html = await response.text();
   container.innerHTML = html;
 }

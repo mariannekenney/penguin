@@ -36,8 +36,9 @@ This repository contains custom frontend work completed for the Penguin Racing S
 
 The custom frontend code is organized within a `src` folder, structured as follows:
 
-- `style.css` — The main stylesheet  
-- `site/` — Contains JavaScript and HTML files related to *site pages* (pages managed by Penguin)  
-- `system/` — Contains JavaScript and HTML files related to *system pages* (pages managed by Wild Apricot)  
+- `custom-settings/` — Files related to *Custom Settings* 
+- `event-details/` — Files related to *Event Details*
+- `event-registration/` — Files related to *Event Registration*
+- `style.css` — Main stylesheet
 
-The custom code is injected via a *Custom HTML Gadget* within Wild Apricot, which loads the compiled JavaScript files from this repository. This approach enables dynamic behavior and layout control without modifying Wild Apricot’s core platform.
+The custom code is injected via a *Custom HTML Gadget* within Wild Apricot, which loads the compiled files from this repository. This approach enables dynamic behavior and layout control without modifying Wild Apricot’s core platform.

@@ -1,0 +1,98 @@
+.custom-modal {
+  max-width: 50%;
+  max-height: 50%;
+  border-radius: 5px;
+  border-color: transparent;
+  overflow: auto;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.modal-content {
+  margin: 20px;
+}
+
+.modal-button {
+  float: right;
+  margin-top: 20px;
+  padding: 10px 20px;
+  border: none;
+  border-radius: 2px;
+  font-size: 16px;
+  cursor: pointer;
+}
+
+.modal-button#complete {
+  margin-left: 10px;
+  font-weight: bold;
+}
+
+#join-waitlist {
+  margin-left: 5px;
+  padding: 10px;
+  border: none;
+  border-radius: 2px;
+  font-weight: bold;
+  cursor: pointer;
+}
+
+.custom-alert {
+  background-color: rgba(64, 178, 207, 0.1);
+  padding: 15px 25px;
+  margin-bottom: 30px;
+  font-size: 16px;
+}
+
+.custom-alert h4 {
+  margin-top: 0;
+  margin-bottom: 5px;
+  text-align: left;
+}
+
+.custom-alert a {
+  color: white;
+  text-decoration: underline;
+  font-weight: bold;
+}
+
+.custom-alert {
+  background-color: rgba(64, 178, 207, 0.1);
+  border-left: 5px solid #40b2cf;
+  padding: 16px;
+  margin: 8px;
+  display: flex;
+  gap: 18px;
+}
+
+.alert-icon {
+  font-size: 48px;
+  color: #ED1C24;
+}
+
+.alert-content {
+  font-size: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.alert-title {
+  margin: 0;
+  text-align: left;
+}
+
+.alert-link {
+  color: #40b2cf;
+  text-decoration: underline;
+  font-weight: bold;
+}
+
+.alert-button {
+  width: fit-content;
+  margin-top: 16px;
+  padding: 8px 16px;
+  color: white;
+  background-color: #40b2cf;
+  font-weight: bold;
+  border-radius: 4px;
+  text-decoration: none;
+}

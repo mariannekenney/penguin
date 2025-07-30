@@ -1,5 +1,5 @@
 async function insertHTML() {
-  const response = await fetch('https://mariannekenney.github.io/penguin/src/site/custom-settings.html');
+  const response = await fetch('https://mariannekenney.github.io/penguin/src/custom-settings/custom-settings.html');
   const html = await response.text();
   document.querySelector('#custom-gadget-container').innerHTML = html;
 }
