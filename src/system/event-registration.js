@@ -342,20 +342,20 @@ async function handleUserData(token, userData) {
     const registrationData = await fetchRegistrationData.json();
 
     if (registrationData && registrationData.length == 0) {
-      const before = document.getElementById('idInfoContainer');
-      const newElement = document.createElement('div');
-      newElement.innerHTML += `
-        <div class="custom-alert">
-          <h4 class="">New to Penguin?</h4>
-          Review your 
-          <a href="https://www.penguinracing.com/Rider-Ability" target="_blank">Rider Ability</a> 
-          and check 
-          <a href="https://www.penguinracing.com/Equipment-Requirements" target="_blank">Equipment Requirements</a>
-        </div>`;
+      const alert = document.getElementById('new-user-alert');
+      alert.remove();
+      alert.style.display = 'block';
 
-      before.after(newElement);
+      document.getElementById('idInfoContainer').after(alert);
     }
   } catch (error) {
+    document.querySelector('#idGeneralFormContainer').style.display = 'none';
+    const alert = document.getElementById('user-login-alert');
+    alert.remove();
+    alert.style.display = 'block';
+
+    document.getElementById('idInfoContainer').after(alert);
+
     console.error('Error fetching user registration data:', error);
   }
 }

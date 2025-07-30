@@ -144,3 +144,46 @@
   text-decoration: underline;
   font-weight: bold;
 }
+
+#event-registration .custom-alert {
+  background-color: rgba(64, 178, 207, 0.1);
+  border-left: 5px solid #40b2cf;
+  padding: 16px;
+  margin: 8px;
+  display: flex;
+  gap: 18px;
+}
+
+#event-registration .alert-icon {
+  font-size: 48px;
+  color: #ED1C24;
+}
+
+#event-registration .alert-content {
+  font-size: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+#event-registration .alert-title {
+  margin: 0;
+  text-align: left;
+}
+
+#event-registration .alert-link {
+  color: #40b2cf;
+  text-decoration: underline;
+  font-weight: bold;
+}
+
+#event-registration .alert-button {
+  width: fit-content;
+  margin-top: 16px;
+  padding: 8px 16px;
+  color: white;
+  background-color: #40b2cf;
+  font-weight: bold;
+  border-radius: 4px;
+  text-decoration: none;
+}
