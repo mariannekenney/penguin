@@ -1,3 +1,5 @@
+const WILD_FRUIT_MONKEY_KEY = "__WILD_FRUIT_MONKEY_KEY__";
+
 let registrationType, registrationInfo;
 
 class RegistrationType {
@@ -350,8 +352,7 @@ async function handleUserData(token, userData) {
   }
 }
 
-async function fetchToken() {
-  const apiKey = '';
+async function fetchToken(apiKey) {
   const base64 = btoa(`APIKEY:${apiKey}`);
 
   try {
@@ -441,7 +442,7 @@ async function execute() {
   await insertElements();
   toggleLoader(true);
 
-  const token = await fetchToken();
+  const token = await fetchToken(WILD_FRUIT_MONKEY_KEY);
   const userData = await fetchUserData();
 
   if (userData) {
