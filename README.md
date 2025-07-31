@@ -42,3 +42,6 @@ The custom frontend code is organized within a `src` folder, structured as follo
 - `style.css` — Main stylesheet
 
 The custom code is injected via a *Custom HTML Gadget* within Wild Apricot, which loads the compiled files from this repository. This approach enables dynamic behavior and layout control without modifying Wild Apricot’s core platform.
+
+&nbsp;
+Developed by Marianne Kenney
