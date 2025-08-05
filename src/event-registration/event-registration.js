@@ -153,35 +153,48 @@ class RegistrationInfo {
         container.querySelector('span[id*="titleLabel"]')?.textContent.includes(dataName[1])
       )[0];
 
-      mainField.addEventListener("change", function (event) {
+      const startSelected = Array.from(mainField.querySelectorAll('div[class*="fieldItem"]'))
+        .filter(item => item.querySelector('input').checked);
+
+      if (startSelected.length > 0) {
+        const selectedLabel = startSelected[0].querySelector('label').textContent;
+        this.handleSubOptions(selectedLabel, eventData, name, subField);
+      }
+
+      mainField.addEventListener("change", (event) => {
         const selected = document.querySelector(`label[for*="${event.target.value}"]`).textContent;
-        const limitSubOptions = eventData
-          .filter(data => name.includes(data.name) && selected.includes(data.option) && data.count >= data.limit)
-          .map(data => data.suboption);
 
-        subField.querySelectorAll('div[class*="fieldItem"]').forEach(item => {
-          item.querySelector('span.textLine').style = '';
-          item.querySelector('input').disabled = false;
-        });
-
-        limitSubOptions.forEach(suboption => {
-          subField.querySelectorAll('div[class*="fieldItem"]').forEach(item => {
-            const label = item.querySelector('span.textLine');
-
-            if (label.textContent.includes(suboption)) {
-              label.style = 'text-decoration: line-through';
-              item.querySelector('input').disabled = true;
-              item.querySelector('input').checked = false;
-            }
-          });
-        });
+        this.handleSubOptions(selected, eventData, name, subField);
       });
 
-      mainField.querySelector('a.clearSelectionLabel').addEventListener("click", function (event) {
+      mainField.querySelector('a.clearSelectionLabel').addEventListener("click", () => {
         subField.querySelectorAll('div[class*="fieldItem"]').forEach(item => {
           item.querySelector('span.textLine').style = '';
           item.querySelector('input').disabled = false;
         });
+      });
+    });
+  }
+
+  handleSubOptions(selected, eventData, name, subField) {
+    const limitSubOptions = eventData
+      .filter(data => name.includes(data.name) && selected.includes(data.option) && data.count >= data.limit)
+      .map(data => data.suboption);
+
+    subField.querySelectorAll('div[class*="fieldItem"]').forEach(item => {
+      item.querySelector('span.textLine').style = '';
+      item.querySelector('input').disabled = false;
+    });
+
+    limitSubOptions.forEach(suboption => {
+      subField.querySelectorAll('div[class*="fieldItem"]').forEach(item => {
+        const label = item.querySelector('span.textLine');
+
+        if (label.textContent.includes(suboption)) {
+          label.style = 'text-decoration: line-through';
+          item.querySelector('input').disabled = true;
+          item.querySelector('input').checked = false;
+        }
       });
     });
   }
@@ -202,18 +215,18 @@ class RegistrationInfo {
         </label>`;
     });
 
-    document.getElementById('join-waitlist').addEventListener('click', function (event) {
+    document.getElementById('join-waitlist').addEventListener('click', (event) => {
       event.preventDefault();
       modal.showModal();
     });
 
     const recipientIds = this.emailRecipientIds;
-    modal.querySelector('.modal-button#complete').addEventListener('click', function (event) {
+    modal.querySelector('.modal-button#complete').addEventListener('click', (event) => {
       event.preventDefault();
       sendWaitlistEmail(modal, recipientIds, this.eventId);
     });
 
-    modal.querySelector('.modal-button#cancel').addEventListener('click', function (event) {
+    modal.querySelector('.modal-button#cancel').addEventListener('click', (event) => {
       event.preventDefault();
       modal.close();
     });
@@ -295,13 +308,13 @@ class RegistrationInfo {
     const modal = document.querySelector('.custom-modal#cancellation');
 
     if (modal) {
-      document.body.addEventListener('click', function (event) {
+      document.body.addEventListener('click', (event) => {
         if (event.target && event.target.matches('input[id*="termsOfUseCheckBox"]')) {
           if (event.target.checked) modal.showModal();
         }
       });
 
-      modal.querySelector('.modal-button#complete').addEventListener('click', function (event) {
+      modal.querySelector('.modal-button#complete').addEventListener('click', (event) => {
         event.preventDefault();
         modal.close();
       });
