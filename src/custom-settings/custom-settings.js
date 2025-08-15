@@ -271,12 +271,12 @@ function displayTable(tableData) {
       const input = document.getElementById(`class-${i}`);
 
       if (input) {
-        input.addEventListener('input', () => {
+        input.addEventListener('input', function () {
           this.style.borderColor = '#40b2cf';
           document.getElementById('save').disabled = false;
         });
 
-        input.addEventListener('wheel', (event) => {
+        input.addEventListener('wheel', function (event) {
           event.preventDefault();
         });
       }
