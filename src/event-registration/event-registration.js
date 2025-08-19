@@ -399,13 +399,13 @@ async function fetchUserData() {
   }
 }
 
-async function handleGuest(id) {
+async function handleGuest(token, id) {
   try {
-    const fetchGuest = await fetch(`/sys/api/v2/accounts/189391/eventregistrations/${id}`, {
+    const fetchGuest = await fetch(`https://api.wildapricot.org/v2.2/accounts/189391/eventregistrations/${id}`, {
       method: 'GET',
-      headers: { 'clientId': 'devUser' },
-      cache: 'no-cache'
+      headers: { 'Authorization': `Bearer ${token}` }
     });
+
     return await fetchGuest.json();
   } catch (error) {
     console.error(error);
@@ -424,8 +424,11 @@ async function fetchRegistrationInfoData(token, eventId, userData) {
       const guests = registration.GuestRegistrationsSummary?.GuestRegistrations;
       if (guests?.length > 0) {
         for (guest of guests) {
-          const guestRegistration = await handleGuest(guest.Id);
-          registrationData.push(guestRegistration);
+          const guestRegistration = await handleGuest(token, guest.Id);
+
+          if (guestRegistration) {
+            registrationData.push(guestRegistration);
+          }
         }
       }
     }
