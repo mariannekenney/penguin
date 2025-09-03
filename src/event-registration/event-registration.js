@@ -12,31 +12,13 @@ class RegistrationType {
       .map(element => element.textContent.trim())
       .filter(label => label !== 'Equipment Only');
 
-    const groups = {};
+    const generalLabels = labels.filter(label => label.toLowerCase().includes('general'));
 
-    labels.forEach(label => {
-      const split = label.split(" ");
-      const key = `${split[0]} ${split[1]}`;
-
-      if (groups[key]) {
-        const newSplit = Number(label.split('$')[1]?.split('.')[0]);
-        const existingSplit = Number(groups[key].split('$')[1]?.split('.')[0]);
-
-        if (newSplit < existingSplit) {
-          groups[key] = label;
-        }
-      } else {
-        groups[key] = label;
-      }
-    });
-
-    const duplicates = labels.filter(label => label.includes('$') && !Object.values(groups).includes(label));
-
-    if (duplicates.length > 0) {
+    if (labels.length > generalLabels.length) {
       document.querySelectorAll('.eventRegistrationTypeRadioWrapper').forEach(item => {
         const label = item.querySelector('label').textContent.trim();
 
-        if (duplicates.includes(label)) {
+        if (generalLabels.includes(label)) {
           item.style.display = 'none';
         }
       })
