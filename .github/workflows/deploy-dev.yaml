@@ -1,0 +1,43 @@
+name: DEV: deploy dev branch
+
+on:
+  push:
+    branches:
+      - dev
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Prepare site files
+        run: |
+          mkdir -p dist/src
+          cp -r src/. dist/src/
+
+      - name: Inject secrets into JS
+        run: |
+          find dist/src -type f -name "*.js" -exec sed -i 's|__WILD_FRUIT_MONKEY_KEY__|${{ secrets.WILD_FRUIT_MONKEY_KEY }}|g' {} +
+
+      - name: Move into /dev subdir
+        run: |
+          mkdir -p public/dev
+          cp -r dist/* public/dev/
+
+      - name: Upload Pages artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: pages
+          path: public
+
+      - name: Deploy to GitHub Pages
+        uses: actions/deploy-pages@v4
+        with:
+          keep_files: true

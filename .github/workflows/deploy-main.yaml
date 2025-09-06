@@ -1,4 +1,4 @@
-name: Deploy static site to GitHub Pages
+name: PROD: deploy main branch
 
 on:
   push:
@@ -13,9 +13,6 @@ permissions:
 jobs:
   deploy:
     runs-on: ubuntu-latest
-    environment:
-      name: github-pages
-
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -25,13 +22,14 @@ jobs:
           mkdir -p dist/src
           cp -r src/. dist/src/
 
-      - name: Inject WILD_FRUIT_MONKEY_KEY into JS
+      - name: Inject secrets into JS
         run: |
           find dist/src -type f -name "*.js" -exec sed -i 's|__WILD_FRUIT_MONKEY_KEY__|${{ secrets.WILD_FRUIT_MONKEY_KEY }}|g' {} +
 
-      - name: Upload pages artifact
-        uses: actions/upload-pages-artifact@v3
+      - name: Upload Pages artifact
+        uses: actions/upload-artifact@v4
         with:
+          name: pages
           path: dist
 
       - name: Deploy to GitHub Pages
