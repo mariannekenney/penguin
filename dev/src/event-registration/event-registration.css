@@ -1,0 +1,88 @@
+.custom-modal {
+  max-width: 50%;
+  max-height: 50%;
+  border-radius: 5px;
+  border-color: transparent;
+  overflow: auto;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.modal-content {
+  margin: 20px;
+}
+
+.modal-button {
+  float: right;
+  margin-top: 20px;
+  padding: 10px 20px;
+  border: none;
+  border-radius: 2px;
+  font-size: 16px;
+  cursor: pointer;
+}
+
+.modal-button#complete {
+  margin-left: 10px;
+  font-weight: bold;
+}
+
+#join-waitlist {
+  margin-left: 5px;
+  padding: 10px;
+  border: none;
+  border-radius: 2px;
+  font-weight: bold;
+  cursor: pointer;
+}
+
+.custom-alert {
+  width: fit-content;
+  max-width: 75%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 18px;
+  margin: 24px auto;
+  padding: 24px 48px;
+  background-color: rgba(64, 178, 207, 0.1);
+}
+
+.alert-content {
+  display: flex;
+  gap: 18px;
+}
+
+.alert-icon {
+  font-size: 48px !important;
+  color: #ED1C24;
+}
+
+.alert-details {
+  font-size: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.alert-title {
+  margin: 0;
+  text-align: left;
+}
+
+.alert-link {
+  color: #40b2cf !important;
+  font-weight: bold !important;
+  text-decoration: underline !important;
+}
+
+.alert-button,
+.alert-button:hover {
+  width: fit-content;
+  margin-top: 16px;
+  padding: 8px 16px;
+  background-color: #40b2cf;
+  color: white;
+  border-radius: 4px;
+  text-decoration: none;
+  font-weight: bold;
+}
