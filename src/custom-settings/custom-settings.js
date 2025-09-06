@@ -321,6 +321,33 @@ async function handleGuest(id) {
   }
 }
 
+async function fetchEventRegistrations() {
+  try {
+    const allRegistrations = [];
+    let offset = 0;
+    const limit = 100;
+
+    while (true) {
+      const response = await fetch(`/sys/api/v2/accounts/189391/eventregistrations?eventId=${selectedEventId}&top=${limit}&skip=${offset}`, {
+        method: 'GET',
+        headers: { 'clientId': 'devUser' },
+        cache: 'no-cache',
+      });
+
+      const data = await response.json();
+      allRegistrations.push(...data);
+
+      if (data.length < limit) {
+        break;
+      }
+      offset += limit;
+    }
+    return allRegistrations;
+  } catch (error) {
+    catchError(error);
+  }
+}
+
 async function fetchEventData() {
   toggleLoader(true);
 
@@ -332,12 +359,7 @@ async function fetchEventData() {
     });
     const event = await fetchEvent.json();
 
-    const fetchRegisrations = await fetch(`/sys/api/v2/accounts/189391/eventregistrations?eventId=${selectedEventId}`, {
-      method: 'GET',
-      headers: { 'clientId': 'devUser' },
-      cache: 'no-cache'
-    });
-    const registrations = await fetchRegisrations.json();
+    const registrations = await fetchEventRegistrations();
 
     for (registration of registrations) {
       const guests = registration.GuestRegistrationsSummary?.GuestRegistrations;
@@ -366,7 +388,7 @@ async function fetchEventsData() {
   try {
     const limits = await fetchLimitsData();
 
-    const fetchEvents = await fetch(`/sys/api/v2/accounts/189391/events?$filter=StartDate ge ${(new Date()).toISOString()}&$sort=ByStartDate asc`, {
+    const fetchEvents = await fetch(`/sys/api/v2/accounts/189391/events?$filter=StartDate ge ${(new Date()).toISOString()}&$sort=ByStartDate asc&$top=100`, {
       method: 'GET',
       headers: { 'clientId': 'devUser' },
       cache: 'no-cache'

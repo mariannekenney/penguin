@@ -354,7 +354,7 @@ async function insertElements() {
 
 async function handleUserData(token, userData) {
   try {
-    const fetchRegistrationData = await fetch(`https://api.wildapricot.org/v2.2/accounts/189391/eventregistrations?contactId=${userData.Id}`, {
+    const fetchRegistrationData = await fetch(`https://api.wildapricot.org/v2.2/accounts/189391/eventregistrations?contactId=${userData.Id}&$top=100`, {
       method: 'GET',
       headers: { 'Authorization': `Bearer ${token}` }
     });
@@ -416,13 +416,35 @@ async function handleGuest(token, id) {
   }
 }
 
+async function fetchEventRegistrations(token) {
+  try {
+    const allRegistrations = [];
+    let offset = 0;
+    const limit = 100;
+
+    while (true) {
+      const response = await fetch(`https://api.wildapricot.org/v2.2/accounts/189391/eventregistrations?eventId=${selectedEventId}&top=${limit}&skip=${offset}`, {
+        method: 'GET',
+        headers: { 'Authorization': `Bearer ${token}` }
+      });
+
+      const data = await response.json();
+      allRegistrations.push(...data);
+
+      if (data.length < limit) {
+        break;
+      }
+      offset += limit;
+    }
+    return allRegistrations;
+  } catch (error) {
+    console.error('Error fetching event registration data:', error);
+  }
+}
+
 async function fetchRegistrationInfoData(token, eventId, userData) {
   try {
-    const fetchRegistrationData = await fetch(`https://api.wildapricot.org/v2.2/accounts/189391/eventregistrations?eventId=${eventId}`, {
-      method: 'GET',
-      headers: { 'Authorization': `Bearer ${token}` }
-    });
-    const registrationData = await fetchRegistrationData.json();
+    const registrationData = await this.fetchEventRegistrations(token);
 
     for (registration of registrationData) {
       const guests = registration.GuestRegistrationsSummary?.GuestRegistrations;
