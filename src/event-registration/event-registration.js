@@ -321,7 +321,29 @@ function watchForChanges() {
 }
 
 async function insertElements() {
-  const response = await fetch('https://mariannekenney.github.io/penguin/src/event-registration/event-registration.html');
+  let links = [
+    'https://mariannekenney.github.io/penguin/src/event-registration/event-registration.html',
+    'https://mariannekenney.github.io/penguin/src/event-registration/event-registration.css',
+    'https://mariannekenney.github.io/penguin/src/style.css'
+  ];
+
+  if (localStorage.getItem('developer') === '66619561') {
+    links.forEach((url) => {
+      url = url.split('src').join('dev/src');
+    });
+    console.log('DEV env .html & .css');
+  }
+
+  links
+    .filter((url) => url.includes('.css'))
+    .forEach((url) => {
+      const link = document.createElement('link');
+      link.rel = 'stylesheet';
+      link.href = url;
+      document.head.appendChild(link);
+    });
+
+  const response = await fetch(links.find((url) => url.includes('.html')));
   const html = await response.text();
 
   const container = document.getElementById('idRegistrationFormContainer')

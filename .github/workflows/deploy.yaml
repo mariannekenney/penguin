@@ -1,9 +1,10 @@
-name: Deploy static site to GitHub Pages
+name: Deploy main & dev
 
 on:
   push:
     branches:
       - main
+      - dev
 
 permissions:
   contents: read
@@ -20,19 +21,33 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: Prepare site files
+      - name: Prepare Pages directories
         run: |
-          mkdir -p dist/src
-          cp -r src/. dist/src/
+          mkdir -p pages/src
+          mkdir -p pages/dev/src
 
-      - name: Inject WILD_FRUIT_MONKEY_KEY into JS
+          git fetch origin main --depth=1
+          git checkout origin/main -- src
+          cp -r src/* pages/src
+
+          git fetch origin dev --depth=1
+          git checkout origin/dev -- src
+          cp -r src/* pages/dev/src
+
+      - name: Clean Pages folders
         run: |
-          find dist/src -type f -name "*.js" -exec sed -i 's|__WILD_FRUIT_MONKEY_KEY__|${{ secrets.WILD_FRUIT_MONKEY_KEY }}|g' {} +
+          find pages -name ".DS_Store" -type f -delete
+          find pages -name "._*" -type f -delete
+          find pages -type l -exec rm -rf {} +
+
+      - name: Inject secrets into JS
+        run: |
+          find pages -type f -name "*.js" -exec sed -i 's|__WILD_FRUIT_MONKEY_KEY__|${{ secrets.WILD_FRUIT_MONKEY_KEY }}|g' {} +
 
       - name: Upload pages artifact
         uses: actions/upload-pages-artifact@v3
         with:
-          path: dist
+          path: pages
 
       - name: Deploy to GitHub Pages
         uses: actions/deploy-pages@v4
