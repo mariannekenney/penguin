@@ -42,7 +42,19 @@ async function execute() {
     const title = document.querySelector('h3.formTitle')?.textContent.trim();
 
     let step;
-    if (title === 'Choose ticket type') {
+    if (title === 'Enter registrant email') {
+      const next = document.querySelector('input[value="Next"]');
+      if (next) {
+        next.click();
+      }
+
+      return;
+    } else if (title === 'Choose ticket type') {
+      const back = document.querySelector('input[value="Back"]');
+      if (back) {
+        back.style.display = 'none';
+      }
+      
       step = "step-two";
     } else if (title === 'Enter registration information') {
       step = "step-three";
