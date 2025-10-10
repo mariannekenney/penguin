@@ -70,7 +70,7 @@
 }
 
 .alert-link {
-  color: #40b2cf !important;
+  color: #008bae !important;
   font-weight: bold !important;
   text-decoration: underline !important;
 }
@@ -80,9 +80,31 @@
   width: fit-content;
   margin-top: 16px;
   padding: 8px 16px;
-  background-color: #40b2cf;
+  background-color: #008bae;
   color: white;
   border-radius: 4px;
   text-decoration: none;
   font-weight: bold;
+}
+
+.custom-section {
+  display: flex;
+  align-items: center;
+  padding: 10px;
+  border-top: 2px solid #008bae;
+  font-weight: bold;
+  font-size: 18px;
+  cursor: pointer;
+}
+
+.custom-section-arrow { 
+  display: flex;
+  justify-content: center;
+  width: 40px;
+  font-size: 16px;
+  color: #008bae;
+}
+
+.custom-section-arrow.open {
+  transform: rotate(90deg);
 }

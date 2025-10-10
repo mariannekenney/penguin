@@ -23,11 +23,37 @@ export async function execute(backend, token, id) {
 
     emailRecipientIds = [27905286, 54159054, 27905257];
 
+    styleSections();
     limitOptions();
     limitWithSubOptions();
     becomeMember();
     rainInsurance();
     cancellationTerms();
+}
+
+function styleSections() {
+    document.querySelectorAll('.captionOuterContainer').forEach((section) => {
+        const title = section.textContent.trim();
+        if (!title.includes('LTF')) {
+            let sectionDisplay;
+            if (!title.includes('Policies') && !title.includes('General')) {
+                sectionDisplay = '<div class="custom-section"><span class="custom-section-arrow open">▶</span>';
+            } else {
+                sectionDisplay = '<div class="custom-section" style="padding-left: 50px;">';
+            }
+            section.innerHTML = sectionDisplay + `<span>${title}</span></div>`;
+
+            section.addEventListener('click', () => {
+                const arrow = section.querySelector('.custom-section-arrow');
+                if (arrow) {
+                    arrow.classList.toggle('open');
+                    
+                    const content = section.nextElementSibling;
+                    content.style.display = (content.style.display === 'none') ? 'block' : 'none';
+                }
+            });
+        }
+    });
 }
 
 function limitOptions() {
@@ -135,7 +161,7 @@ function limitWithSubOptions() {
             handleSubOptions(selected, eventData, name, subField);
         });
 
-        mainField.querySelector('a.clearSelectionLabel').addEventListener("click", () => {
+        mainField.querySelector('a.clearSelectionLabel').addEventListener('click', () => {
             subField.querySelectorAll('div[class*="fieldItem"]').forEach(item => {
                 item.querySelector('span.textLine').style = '';
                 item.querySelector('input').disabled = false;
