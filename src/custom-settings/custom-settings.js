@@ -1,28 +1,12 @@
-async function insertHTML() {
-  let links = [
-    'https://mariannekenney.github.io/penguin/src/custom-settings/custom-settings.html',
-    'https://mariannekenney.github.io/penguin/src/custom-settings/custom-settings.css',
-    'https://mariannekenney.github.io/penguin/src/style.css'
-  ];
+let backend, dataJSON;
 
-  if (localStorage.getItem('developer') === '66619561') {
-    links.forEach((url) => {
-      url = url.split('src').join('dev/src');
-    });
-    console.log('DEV env .html & .css');
-  }
+async function insertHTMLCSS() {
+  const html = await backend.fetchHTMLCSS([
+    'custom-settings/custom-settings.html',
+    'custom-settings/custom-settings.css',
+    'style.css'
+  ]);
 
-  links
-    .filter((url) => url.includes('.css'))
-    .forEach((url) => {
-      const link = document.createElement('link');
-      link.rel = 'stylesheet';
-      link.href = url;
-      document.head.appendChild(link);
-    });
-
-  const response = await fetch(links.find((url) => url.includes('.html')));
-  const html = await response.text();
   document.querySelector('.zoneHeader4 .gadgetStyleBody').innerHTML = html;
 }
 
@@ -60,12 +44,12 @@ async function uploadFile(file) {
     const body = new FormData();
     body.append('file', file);
 
-    const fetchEvent = await fetch('/resources', {
+    await fetch('/resources', {
       method: 'POST',
       body
     });
 
-    fetchEventsData();
+    getEvents();
   } catch (error) {
     catchError(error);
   }
@@ -136,12 +120,10 @@ function eventDropdown(events) {
   events.forEach(event => {
     dropdown.innerHTML += `<option value="${event.Id}">${event.Name}</option>`;
   });
-  selectedEventId = events[0].Id;
-  fetchEventData();
+  getEventData(events[0].Id);
 
   dropdown?.addEventListener('change', function () {
-    selectedEventId = this.value;
-    fetchEventData();
+    getEventData(this.value);
   });
 }
 
@@ -306,72 +288,15 @@ function displayTable(tableData) {
   });
 }
 
-let dataJSON, selectedEventId;
-
-async function handleGuest(id) {
-  try {
-    const fetchGuest = await fetch(`/sys/api/v2/accounts/189391/eventregistrations/${id}`, {
-      method: 'GET',
-      headers: { 'clientId': 'devUser' },
-      cache: 'no-cache'
-    });
-    return await fetchGuest.json();
-  } catch (error) {
-    console.error(error);
-  }
-}
-
-async function fetchEventRegistrations() {
-  try {
-    const allRegistrations = [];
-    let offset = 0;
-    const limit = 100;
-
-    while (true) {
-      const response = await fetch(`/sys/api/v2/accounts/189391/eventregistrations?eventId=${selectedEventId}&top=${limit}&skip=${offset}`, {
-        method: 'GET',
-        headers: { 'clientId': 'devUser' },
-        cache: 'no-cache',
-      });
-
-      const data = await response.json();
-      allRegistrations.push(...data);
-
-      if (data.length < limit) {
-        break;
-      }
-      offset += limit;
-    }
-    return allRegistrations;
-  } catch (error) {
-    catchError(error);
-  }
-}
-
-async function fetchEventData() {
+async function getEventData(eventId) {
   toggleLoader(true);
 
   try {
-    const fetchEvent = await fetch(`/sys/api/v2/accounts/189391/events/${selectedEventId}`, {
-      method: 'GET',
-      headers: { 'clientId': 'devUser' },
-      cache: 'no-cache'
-    });
-    const event = await fetchEvent.json();
+    const token = await backend.fetchToken();
+    const event = await backend.fetchEvent(eventId);
+    const registrations = await backend.fetchEventRegistrations(token, eventId);
 
-    const registrations = await fetchEventRegistrations();
-
-    for (registration of registrations) {
-      const guests = registration.GuestRegistrationsSummary?.GuestRegistrations;
-      if (guests?.length > 0) {
-        for (guest of guests) {
-          const guestRegistration = await handleGuest(guest.Id);
-          registrations.push(guestRegistration);
-        }
-      }
-    }
-
-    const limits = dataJSON.data.find(data => data.eventId == selectedEventId);
+    const limits = dataJSON.data.find(data => data.eventId == eventId);
     setupTable(event, (limits || []), registrations);
 
     toggleLoader(false);
@@ -382,18 +307,12 @@ async function fetchEventData() {
   }
 }
 
-async function fetchEventsData() {
+async function getEvents() {
   toggleLoader(true);
 
   try {
-    const limits = await fetchLimitsData();
-
-    const fetchEvents = await fetch(`/sys/api/v2/accounts/189391/events?$filter=StartDate ge ${(new Date()).toISOString()}&$sort=ByStartDate asc&$top=100`, {
-      method: 'GET',
-      headers: { 'clientId': 'devUser' },
-      cache: 'no-cache'
-    });
-    const events = await fetchEvents.json();
+    const limits = await backend.fetchLimits();
+    const events = await backend.fetchAllEvents();
 
     const eventIds = events.Events.map(event => `${event.Id}`);
     dataJSON = {
@@ -406,18 +325,12 @@ async function fetchEventsData() {
   }
 }
 
-async function fetchLimitsData() {
-  try {
-    const fetchLimits = await fetch('/resources/Admin_Registration_Management.json');
-    return await fetchLimits.json();
-  } catch (error) {
-    console.error(error);
-  }
-}
-
 async function execute() {
-  await insertHTML();
-  await fetchEventsData();
+  // TO DO: CHANGE
+  backend = await import('https://mariannekenney.github.io/penguin/dev/src/backend.js');
+
+  await insertHTMLCSS();
+  await getEvents();
 }
 
 execute();

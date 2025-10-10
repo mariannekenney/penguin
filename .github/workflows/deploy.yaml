@@ -42,7 +42,9 @@ jobs:
 
       - name: Inject secrets into JS
         run: |
-          find pages -type f -name "*.js" -exec sed -i 's|__WILD_FRUIT_MONKEY_KEY__|${{ secrets.WILD_FRUIT_MONKEY_KEY }}|g' {} +
+          find pages -type f -name "*.js" -exec sed -i 's|__WILD_APRICOT_API_KEY__|${{ secrets.WILD_APRICOT_API_KEY }}|g' {} +
+          find pages -type f -name "*.js" -exec sed -i 's|__WILD_APRICOT_ACCOUNT_ID__|${{ secrets.WILD_APRICOT_ACCOUNT_ID }}|g' {} +
+          find pages -type f -name "*.js" -exec sed -i 's|__WILD_APRICOT_DEV_ID__|${{ secrets.WILD_APRICOT_DEV_ID }}|g' {} +
 
       - name: Upload pages artifact
         uses: actions/upload-pages-artifact@v3

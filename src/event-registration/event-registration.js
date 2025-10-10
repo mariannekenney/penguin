@@ -1,6 +1,4 @@
-const WILD_FRUIT_MONKEY_KEY = "__WILD_FRUIT_MONKEY_KEY__";
-
-let registrationType, registrationInfo;
+let backend, registrationType, registrationInfo;
 
 class RegistrationType {
   constructor() {
@@ -33,7 +31,7 @@ class RegistrationInfo {
     this.eventId = eventId;
     this.eventLimits = eventLimits;
     this.registrationData = registrationData;
-    this.emailRecipientIds = [27905286, 54159054, 27905257];
+    this.emailRecipientIds = [27905286, 54159054, 27905257]; 
   }
 
   execute() {
@@ -320,175 +318,39 @@ function watchForChanges() {
   observer.observe(document.querySelector('h3.formTitle'), { childList: true, subtree: true, attributes: true });
 }
 
-async function insertElements() {
-  let links = [
-    'https://mariannekenney.github.io/penguin/src/event-registration/event-registration.html',
-    'https://mariannekenney.github.io/penguin/src/event-registration/event-registration.css',
-    'https://mariannekenney.github.io/penguin/src/style.css'
-  ];
-
-  if (localStorage.getItem('developer') === '66619561') {
-    links.forEach((url) => {
-      url = url.split('src').join('dev/src');
-    });
-    console.log('DEV env .html & .css');
-  }
-
-  links
-    .filter((url) => url.includes('.css'))
-    .forEach((url) => {
-      const link = document.createElement('link');
-      link.rel = 'stylesheet';
-      link.href = url;
-      document.head.appendChild(link);
-    });
-
-  const response = await fetch(links.find((url) => url.includes('.html')));
-  const html = await response.text();
+async function insertHTMLCSS() {
+  const html = await backend.fetchHTMLCSS([
+    'event-registration/event-registration.html',
+    'event-registration/event-registration.css',
+    'style.css'
+  ]);
 
   const container = document.getElementById('idRegistrationFormContainer')
     || document.getElementById('idSelectRegistrationTypeContainer')
     || document.getElementById('idIdentifyUserContainer');
+
   container.innerHTML += html;
-}
-
-async function handleUserData(token, userData) {
-  try {
-    const fetchRegistrationData = await fetch(`https://api.wildapricot.org/v2.2/accounts/189391/eventregistrations?contactId=${userData.Id}&$top=100`, {
-      method: 'GET',
-      headers: { 'Authorization': `Bearer ${token}` }
-    });
-    const registrationData = await fetchRegistrationData.json();
-
-    if (registrationData && registrationData.length == 0) {
-      const container = document.getElementById('idGeneralFormContainer');
-      container.innerHTML = document.getElementById('new-user-alert').innerHTML + container.innerHTML;
-    }
-  } catch (error) {
-    console.error('Error fetching user registration data:', error);
-  }
-}
-
-async function fetchToken(apiKey) {
-  const base64 = btoa(`APIKEY:${apiKey}`);
-
-  try {
-    const authResponse = await fetch('https://oauth.wildapricot.org/auth/token', {
-      method: 'POST',
-      headers: {
-        'Authorization': `Basic ${base64}`,
-        'Content-Type': 'application/x-www-form-urlencoded',
-      },
-      body: 'grant_type=client_credentials&scope=auto',
-    });
-    const authData = await authResponse.json();
-    return authData.access_token;
-  } catch (error) {
-    console.error('Error fetching token:', error);
-    return null;
-  }
-}
-
-async function fetchUserData() {
-  try {
-    const fetchUser = await fetch('/sys/api/v2/accounts/189391/contacts/me', {
-      method: 'GET',
-      headers: { 'clientId': 'devUser' },
-      cache: 'no-store'
-    });
-    return await fetchUser.json();
-  } catch (error) {
-    console.error('Error fetching user data:', error);
-    return null;
-  }
-}
-
-async function handleGuest(token, id) {
-  try {
-    const fetchGuest = await fetch(`https://api.wildapricot.org/v2.2/accounts/189391/eventregistrations/${id}`, {
-      method: 'GET',
-      headers: { 'Authorization': `Bearer ${token}` }
-    });
-
-    return await fetchGuest.json();
-  } catch (error) {
-    console.error(error);
-  }
-}
-
-async function fetchEventRegistrations(token) {
-  try {
-    const allRegistrations = [];
-    let offset = 0;
-    const limit = 100;
-
-    while (true) {
-      const response = await fetch(`https://api.wildapricot.org/v2.2/accounts/189391/eventregistrations?eventId=${selectedEventId}&top=${limit}&skip=${offset}`, {
-        method: 'GET',
-        headers: { 'Authorization': `Bearer ${token}` }
-      });
-
-      const data = await response.json();
-      allRegistrations.push(...data);
-
-      if (data.length < limit) {
-        break;
-      }
-      offset += limit;
-    }
-    return allRegistrations;
-  } catch (error) {
-    console.error('Error fetching event registration data:', error);
-  }
-}
-
-async function fetchRegistrationInfoData(token, eventId, userData) {
-  try {
-    const registrationData = await this.fetchEventRegistrations(token);
-
-    for (registration of registrationData) {
-      const guests = registration.GuestRegistrationsSummary?.GuestRegistrations;
-      if (guests?.length > 0) {
-        for (guest of guests) {
-          const guestRegistration = await handleGuest(token, guest.Id);
-
-          if (guestRegistration) {
-            registrationData.push(guestRegistration);
-          }
-        }
-      }
-    }
-
-    const fetchLimits = await fetch('/resources/Admin_Registration_Management.json');
-    const allLimits = await fetchLimits.json();
-
-    const eventLimits = allLimits.data.find(eventsWithLimits => eventsWithLimits.eventId == eventId)?.data || [];
-
-    const eventDate = document.querySelector('div[id*=InfoEndDateStartDateTimePanel').textContent.trim().split(" - ")[0];
-    const diffTime = Math.abs(new Date(eventDate) - new Date());
-    const isEarly = Math.ceil(diffTime / (1000 * 60 * 60 * 24)) > 9;
-
-    const isMember = userData?.MembershipLevel.Name !== 'Standard Penguin Account';
-
-    registrationInfo = new RegistrationInfo(isEarly, isMember, eventId, eventLimits, registrationData);
-    registrationInfo.execute();
-  } catch (error) {
-    console.error('Error fetching registration info data:', error);
-  }
 }
 
 async function execute() {
   const title = document.querySelector('h3.formTitle')?.textContent.trim();
   const eventId = document.querySelector('a[href*="event-"]')?.href.split('event-')[1];
+  
+  // TO DO: CHANGE
+  backend = await import('https://mariannekenney.github.io/penguin/dev/src/backend.js');
 
-  await insertElements();
+  await insertHTMLCSS();
   toggleLoader(true);
 
-  const token = await fetchToken(WILD_FRUIT_MONKEY_KEY);
-  const userData = await fetchUserData();
+  const token = await backend.fetchToken();
+  const userData = await backend.fetchUser();
 
   if (userData) {
-    await handleUserData(token, userData);
+    const userRegistrations = await backend.fetchUser(token, userData);
+    if (userRegistrations && userRegistrations.length == 0) {
+      const container = document.getElementById('idGeneralFormContainer');
+      container.innerHTML = document.getElementById('new-user-alert').innerHTML + container.innerHTML;
+    }
 
     if (title === 'Choose ticket type') {
       registrationType = new RegistrationType();
@@ -496,7 +358,20 @@ async function execute() {
 
       toggleLoader(false);
     } else if (title === 'Enter registration information') {
-      await fetchRegistrationInfoData(token, eventId, userData);
+      const registrationData = await backend.fetchEventRegistrations(token, eventId);
+
+      const allLimits = await backend.fetchLimits();
+      const eventLimits = allLimits.data.find(eventsWithLimits => eventsWithLimits.eventId == eventId)?.data || [];
+
+      const eventDate = document.querySelector('div[id*=InfoEndDateStartDateTimePanel').textContent.trim().split(" - ")[0];
+      const diffTime = Math.abs(new Date(eventDate) - new Date());
+      const isEarly = Math.ceil(diffTime / (1000 * 60 * 60 * 24)) > 9;
+
+      const isMember = userData?.MembershipLevel.Name !== 'Standard Penguin Account';
+
+      registrationInfo = new RegistrationInfo(isEarly, isMember, eventId, eventLimits, registrationData);
+      registrationInfo.execute();
+      
       toggleLoader(false);
     } else {
       toggleLoader(false);
