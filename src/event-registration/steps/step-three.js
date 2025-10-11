@@ -26,6 +26,7 @@ export async function execute(id, backend, token) {
     styleSections();
     limitOptions();
     limitWithSubOptions();
+    ticketTypeDependency();
     becomeMember();
     rainInsurance();
     gearRentals();
@@ -259,6 +260,39 @@ function sendWaitlistEmail(modal, emailRecipientIds, eventId) {
 
         toggleLoader(false, modal.querySelector('#inner-content'));
     });
+}
+
+function ticketTypeDependency() {
+    const ticketType = document.querySelector('.eventRegistrationInfoRegistrationType .infoText').textContent;
+    
+    if (ticketType && ticketType.includes('Equipment Only')) {
+        const sectionHeader = Array.from(document.querySelectorAll('.captionOuterContainer'))
+            .find((section) => section.textContent.trim().includes('Gear Rentals'));
+
+        // TO DO, ALLOW TO CLICK NEXT
+        if (sectionHeader) {
+            sectionHeader.style.display = 'none';
+            sectionHeader.nextElementSibling.style.display = 'none';
+        }
+    } else if (ticketType) {
+        const div = Array.from(document.getElementsByClassName('fieldSubContainer'))
+            .find(container => {
+                const label = container.querySelector('span[id*="titleLabel"]');
+                return label && label.textContent.includes('Class Attending');
+            });
+
+        div.querySelectorAll('div.fieldItem').forEach(item => {
+            const span = item.querySelector('span.textLine');
+
+            if (
+                (ticketType.includes('Racer') && !span.textContent.includes('Practice'))
+                || (!ticketType.includes('Racer') && span.textContent.includes('Practice'))
+            ) {
+                span.style.color = 'rgba(118, 118, 118, 0.8)';
+                item.querySelector('input').disabled = true;
+            }
+        });
+    }
 }
 
 function becomeMember() {
