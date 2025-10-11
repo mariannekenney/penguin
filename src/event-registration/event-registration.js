@@ -1,3 +1,5 @@
+const WILD_APRICOT_DEV_ID = "__WILD_APRICOT_DEV_ID__";
+
 async function insertHTMLCSS(backend) {
   const html = await backend.fetchHTMLCSS([
     'event-registration/event-registration.html',
@@ -7,7 +9,8 @@ async function insertHTMLCSS(backend) {
 
   const container = document.getElementById('idRegistrationFormContainer')
     || document.getElementById('idSelectRegistrationTypeContainer')
-    || document.getElementById('idIdentifyUserContainer');
+    || document.getElementById('idIdentifyUserContainer')
+    || document.getElementById('idEventRegistrationConfirmationContainer');
 
   container.innerHTML += html;
 }
@@ -30,7 +33,13 @@ function watchForChanges() {
 
 async function execute() {
 // TO DO: CHANGE
-  backend = await import('https://mariannekenney.github.io/penguin/dev/src/backend.js');
+  let baseUrl = 'https://mariannekenney.github.io/penguin/src/'
+  if (localStorage.getItem('developer') === WILD_APRICOT_DEV_ID) {
+    baseUrl = baseUrl.split('src').join('dev/src');
+    console.log('DEV env .js');
+  }
+
+  backend = await import(`${baseUrl}backend.js`);
 
   await insertHTMLCSS(backend);
   toggleLoader(true);
@@ -58,13 +67,14 @@ async function execute() {
       step = "step-two";
     } else if (title === 'Enter registration information') {
       step = "step-three";
+    } else {
+      step = "step-four";
     }
 
     if (step) {
       const eventId = document.querySelector('a[href*="event-"]')?.href.split('event-')[1];
 
-      // TO DO: CHANGE
-      const code = await import(`https://mariannekenney.github.io/penguin/dev/src/event-registration/steps/${step}.js`);
+      const code = await import(`${baseUrl}event-registration/steps/${step}.js`);
       await code.execute(eventId, backend, token);
     }
 
