@@ -35,9 +35,11 @@ const buttonContainer = container.querySelector('.boxActionContainer');
 const newContainer = container.querySelector('.infoText');
 
 if (buttonContainer && newContainer) {
-	newContainer.innerHTML = '';
-	newContainer.appendChild(buttonContainer);
-	newContainer.innerHTML += '<strong>Base fee(s)</strong>';
+	if (diffDays) {
+		newContainer.innerHTML = '';
+		newContainer.appendChild(buttonContainer);
+		newContainer.innerHTML += '<strong>Base fee(s)</strong>';
+	}
 
 	container.querySelector('.infoTitle').style.display = 'none';
 	container.querySelector('.regTypeHr').style.display = 'none';

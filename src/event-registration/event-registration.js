@@ -32,7 +32,6 @@ function watchForChanges() {
 }
 
 async function execute() {
-// TO DO: CHANGE
   let baseUrl = 'https://mariannekenney.github.io/penguin/src/'
   if (localStorage.getItem('developer') === WILD_APRICOT_DEV_ID) {
     baseUrl = baseUrl.split('src').join('dev/src');

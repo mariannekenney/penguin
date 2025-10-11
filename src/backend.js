@@ -99,24 +99,10 @@ export async function fetchEvent(eventId) {
 
 export async function fetchEventRegistrations(token, eventId) {
   try {
-    const registrations = [];
-    let offset = 0;
-    const limit = 100;
-
-    while (true) {
-      const response = await fetch(`https://api.wildapricot.org/v2.2/accounts/${WILD_APRICOT_ACCOUNT_ID}/eventregistrations?eventId=${eventId}&top=${limit}&skip=${offset}`, {
+    const registrations = await fetch(`https://api.wildapricot.org/v2.2/accounts/${WILD_APRICOT_ACCOUNT_ID}/eventregistrations?eventId=${eventId}`, {
         method: 'GET',
         headers: { 'Authorization': `Bearer ${token}` }
       });
-
-      const data = await response.json();
-      registrations.push(...data);
-
-      if (data.length < limit) {
-        break;
-      }
-      offset += limit;
-    }
 
     for (reg of registrations) {
       const guests = reg.GuestRegistrationsSummary?.GuestRegistrations;
