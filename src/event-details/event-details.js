@@ -10,7 +10,7 @@ if (diffDays >= 10) {
 	isEarlyBird = false;
 }
 
-const hasLTF = Array.from(document.getElementsByClassName('regTypeLiLabel'))
+const hasLTF = Array.from(document.querySelectorAll('.regTypeLiLabel'))
 	.map(element => element.textContent.trim())
 	.some(label => label.includes('LTF'));
 
@@ -30,3 +30,19 @@ document.querySelectorAll('.registrationInfo li').forEach(item => {
 	}
 });
 
+const container = document.querySelector('.boxBodyInfoContainer');
+const buttonContainer = container.querySelector('.boxActionContainer');
+const newContainer = container.querySelector('.infoText');
+
+if (buttonContainer && newContainer) {
+	newContainer.innerHTML = '';
+	newContainer.appendChild(buttonContainer);
+	newContainer.innerHTML += '<strong>Base fee(s)</strong>';
+
+	container.querySelector('.infoTitle').style.display = 'none';
+	container.querySelector('.regTypeHr').style.display = 'none';
+
+	const button = container.querySelector('input');
+	button.style.backgroundColor = '#40b2cf';
+	button.style.color = 'white';
+}
