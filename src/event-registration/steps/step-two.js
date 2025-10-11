@@ -1,5 +1,4 @@
 export function execute(x, y, z) {
-    // Remove options based on membership / pricing
     const today = new Date();
     today.setHours(0, 0, 0, 0);
     const eventDate = new Date(document.querySelector('.eventRegistrationInfoEndDate .infoText').textContent.trim().split('-')[0]);

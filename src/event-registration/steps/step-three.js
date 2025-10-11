@@ -28,6 +28,7 @@ export async function execute(backend, token, id) {
     limitWithSubOptions();
     becomeMember();
     rainInsurance();
+    gearRentals();
     cancellationTerms();
 }
 
@@ -261,7 +262,6 @@ function sendWaitlistEmail(modal, emailRecipientIds, eventId) {
 }
 
 function becomeMember() {
-    // Remove label and link to join if already a member
     if (isMember) {
         document.getElementsByClassName('captionOuterContainer')[0].style.display = 'none';
 
@@ -276,7 +276,6 @@ function becomeMember() {
 }
 
 function rainInsurance() {
-    // Remove rain date options if it is too late
     if (!isEarly) {
         const div = Array.from(document.getElementsByClassName('fieldSubContainer'))
             .find(container => {
@@ -297,8 +296,32 @@ function rainInsurance() {
     }
 }
 
+function gearRentals() {
+    const sectionHeader = Array.from(document.querySelectorAll('.captionOuterContainer'))
+        .find((section) => section.textContent.trim().includes('Gear Rentals'));
+
+    if (sectionHeader) {
+        const fieldContainers = Array.from(sectionHeader.nextElementSibling.querySelectorAll('.fieldContainer'));
+
+        for (let i = 0; i < fieldContainers.length - 1; i += 2) {
+            const checkboxes = fieldContainers[i].querySelectorAll('input[type="checkbox"]');
+            
+            if (fieldContainers[i + 1]) {
+                const update = () => {
+                    const anyChecked = Array.from(checkboxes).some((checkbox) => checkbox.checked);
+
+                    fieldContainers[i + 1].style.display = anyChecked ? 'block' : 'none';
+                };
+                
+                update();
+                checkboxes.forEach((checkbox) => checkbox.addEventListener('change', update));
+            }
+        }
+    }
+
+}
+
 function cancellationTerms() {
-    // When user selects cancellation terms, show popup
     const modal = document.querySelector('.custom-modal#cancellation');
 
     if (modal) {
