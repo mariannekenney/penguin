@@ -88,10 +88,10 @@ function limitOptions() {
 
             field.querySelectorAll('div[class*="fieldItem"]')
                 .forEach((item) => {
-                    const label = item.querySelector('label');
+                    const label = item.querySelector('span.textLine');
 
                     if (label.textContent.includes(data.option)) {
-                        label.innerHTML = `<span style="text-decoration: line-through">${label.textContent}</span>`;
+                        label.style.opacity = '0.5';
                         item.querySelector('input').disabled = true;
                     }
                 });
@@ -163,7 +163,7 @@ function limitWithSubOptions() {
 
         mainField.querySelector('a.clearSelectionLabel').addEventListener('click', () => {
             subField.querySelectorAll('div[class*="fieldItem"]').forEach(item => {
-                item.querySelector('span.textLine').style = '';
+                item.querySelector('span.textLine').style.opacity = '1.0';
                 item.querySelector('input').disabled = false;
             });
         });
@@ -176,7 +176,7 @@ function handleSubOptions(selected, eventData, name, subField) {
         .map((data) => data.suboption);
 
     subField.querySelectorAll('div[class*="fieldItem"]').forEach(item => {
-        item.querySelector('span.textLine').style = '';
+        item.querySelector('span.textLine').style.opacity = '1.0';
         item.querySelector('input').disabled = false;
     });
 
@@ -185,7 +185,7 @@ function handleSubOptions(selected, eventData, name, subField) {
             const label = item.querySelector('span.textLine');
 
             if (label.textContent.includes(suboption)) {
-                label.style = 'text-decoration: line-through';
+                label.style.opacity = '0.5';
                 item.querySelector('input').disabled = true;
                 item.querySelector('input').checked = false;
             }
@@ -286,7 +286,7 @@ function ticketTypeDependency() {
                 (ticketType.includes('Racer') && !span.textContent.includes('Practice'))
                 || (!ticketType.includes('Racer') && span.textContent.includes('Practice'))
             ) {
-                span.style.color = 'rgba(118, 118, 118, 0.8)';
+                span.style.opacity = '0.5';
                 item.querySelector('input').disabled = true;
             }
         });
@@ -340,7 +340,7 @@ function rainInsurance() {
         }
 
         if (disable) {
-            span.style.color = 'rgba(118, 118, 118, 0.8)';
+            span.style.opacity = '0.5';
             item.querySelector('input').disabled = true;
         }
     });
