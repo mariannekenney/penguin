@@ -79,8 +79,8 @@ function limitOptions() {
     });
 
     eventData
-        .filter(data => data.limit !== "" && data.count >= data.limit)
-        .forEach(data => {
+        .filter((data) => data.limit !== "" && data.count >= data.limit)
+        .forEach((data) => {
             const field = Array.from(document.querySelectorAll('div[class*="fieldContainer"]'))
                 .filter((container) =>
                     container.querySelector('span[id*="titleLabel"]')?.textContent.includes(data.name)
@@ -116,14 +116,14 @@ function limitOptions() {
 }
 
 function limitWithSubOptions() {
-    const eventData = eventLimits.filter(item => item.suboption).map(item => {
+    const eventData = eventLimits.filter((item) => item.suboption).map((item) => {
         item.limit = parseInt(item.limit);
 
         const itemName = item.name.split(" & ");
         item.count = registrationData
             .map((data) => ({
-                main: data.RegistrationFields.find(field => field.FieldName.includes(itemName[0])),
-                sub: data.RegistrationFields.find(field => field.FieldName.includes(itemName[1]))
+                main: data.RegistrationFields.find(field => field.FieldName.includes(itemName[1])),
+                sub: data.RegistrationFields.find(field => field.FieldName.includes(itemName[0]))
             }))
             .filter((data) => {
                 const mainLabel = Array.isArray(data.main.Value) ? data.main.Value[0]?.Label : data.main.Value?.Label;
@@ -135,56 +135,67 @@ function limitWithSubOptions() {
         return item;
     });
 
-    [...new Set(eventData.map(data => data.name))].forEach(name => {
+    [...new Set(eventData.map((data) => data.name))].forEach((name) => {
         const dataName = name.split(" & ");
         const fieldContainers = Array.from(document.querySelectorAll('div[class*="fieldContainer"]'));
 
         const mainField = fieldContainers.filter((container) =>
-            container.querySelector('span[id*="titleLabel"]')?.textContent.includes(dataName[0])
-        )[0];
-
-        const subField = fieldContainers.filter((container) =>
             container.querySelector('span[id*="titleLabel"]')?.textContent.includes(dataName[1])
         )[0];
 
-        const startSelected = Array.from(mainField.querySelectorAll('div[class*="fieldItem"]'))
-            .filter((item) => item.querySelector('input').checked);
+        const subField = fieldContainers.filter((container) =>
+            container.querySelector('span[id*="titleLabel"]')?.textContent.includes(dataName[0])
+        )[0];
 
-        if (startSelected.length > 0) {
-            const selectedLabel = startSelected[0].querySelector('label').textContent;
-            handleSubOptions(selectedLabel, eventData, name, subField);
-        }
+        const message = document.createElement('span');
+        message.textContent = 'Please select rental dates first.';
+        message.style.marginBottom = '8px';
+        message.style.fontStyle = 'italic';
+        subField.querySelector('a.clearSelectionLabel').after(message);
 
-        mainField.addEventListener("change", (event) => {
-            const selected = document.querySelector(`label[for*="${event.target.value}"]`).textContent;
+        const checkFields = () => {
+            const selectedField = Array.from(mainField.querySelectorAll('div[class*="fieldItem"]'))
+                .filter((item) => item.querySelector('input').checked);
 
-            handleSubOptions(selected, eventData, name, subField);
-        });
+            if (selectedField.length > 0) {
+                const selected = selectedField[0].querySelector('label').textContent;
+                handleSubOptions(selected, eventData, name, subField);
+            } else {
+                subField.querySelectorAll('div[class*="fieldItem"]').forEach(item => {
+                    item.querySelector('span.textLine').style.opacity = '0.5';
+                    item.querySelector('input').disabled = true;
+                    item.querySelector('input').checked = false;
+                });
+            }
 
-        mainField.querySelector('a.clearSelectionLabel').addEventListener('click', () => {
-            subField.querySelectorAll('div[class*="fieldItem"]').forEach(item => {
-                item.querySelector('span.textLine').style.opacity = '1.0';
-                item.querySelector('input').disabled = false;
-            });
-        });
+            const clearSelection = subField.querySelector('a.clearSelectionLabel');
+            clearSelection.style.display = (selectedField.length > 0) ? 'block' : 'none';
+            clearSelection.nextElementSibling.style.display = (selectedField.length > 0) ? 'none' : 'block';
+        };
+
+        checkFields();
+        mainField.addEventListener("change", checkFields);
+        mainField.querySelector('a.clearSelectionLabel').addEventListener("click", checkFields);
     });
 }
 
 function handleSubOptions(selected, eventData, name, subField) {
     const limitSubOptions = eventData
-        .filter((data) => name.includes(data.name) && selected.includes(data.option) && data.count >= data.limit)
-        .map((data) => data.suboption);
-
+        .filter((data) =>
+            name.includes(data.name) && selected.includes(data.suboption) && data.limit !== "" && data.count >= data.limit
+        )
+        .map((data) => data.option);
+    
     subField.querySelectorAll('div[class*="fieldItem"]').forEach(item => {
         item.querySelector('span.textLine').style.opacity = '1.0';
         item.querySelector('input').disabled = false;
     });
 
-    limitSubOptions.forEach((suboption) => {
+    limitSubOptions.forEach((option) => {
         subField.querySelectorAll('div[class*="fieldItem"]').forEach(item => {
             const label = item.querySelector('span.textLine');
 
-            if (label.textContent.includes(suboption)) {
+            if (label.textContent.includes(option)) {
                 label.style.opacity = '0.5';
                 item.querySelector('input').disabled = true;
                 item.querySelector('input').checked = false;
