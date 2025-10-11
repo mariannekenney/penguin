@@ -3,6 +3,10 @@
   justify-content: space-between;
 }
 
+#top h4 {
+  margin: auto 0;
+}
+
 #select-event {
   align-content: center;
 }

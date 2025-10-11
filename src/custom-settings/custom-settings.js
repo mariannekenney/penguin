@@ -134,15 +134,11 @@ function setupRegistrations(fieldOptions, registrationData) {
   fieldOptions.forEach(option => {
     const specifics = fieldsOnly.map((fields, i) => {
       let field = fields.find(field => field.FieldName.includes(option.main));
-      if (!field) {
-        field = fields.find(field => field.FieldName.includes(option.alt));
-      }
-
       let returnValue = field.Value ? (field.Value?.Label || field.Value[0]?.Label) : null;
 
       if (returnValue && option.sub) {
         field = fields.find(field => field.FieldName.includes(option.sub));
-        returnValue = `${returnValue} && ${field.Value ? (field.Value?.Label || field.Value[0]?.Label || '(none)') : null}`;
+        returnValue = `${returnValue} && ${field.Value ? (field.Value?.Label || field.Value[0]?.Label) : null}`;
       }
 
       return returnValue;
@@ -161,9 +157,10 @@ function setupRegistrations(fieldOptions, registrationData) {
 
 function setupTable(event, storedOptions, registrations) {
   const fieldOptions = [
-    { main: 'Class Attending', alt: 'Experience Level', sub: '' },
-    { main: 'Data Driven Coaching', alt: '', sub: '' },
-    { main: 'Rental Bike Selection', alt: '', sub: 'Motorcycle Rental' }
+    { main: 'Class Attending', sub: '' },
+    { main: 'Data Driven Coaching', sub: '' },
+    { main: 'Bike Selection', sub: 'Rental Dates' },
+    { main: 'Discounted Dunlop Tires', sub: '' },
   ];
 
   displayTable(getData(event, storedOptions, fieldOptions, setupRegistrations(fieldOptions, registrations)));
@@ -177,12 +174,6 @@ function getData(event, storedOptions, fieldOptions, registrationsCurrent) {
     let fieldDetails = event.Details.EventRegistrationFields
       .find(field => field.FieldName.includes(fieldOption.main));
 
-    if (!fieldDetails && fieldOption.alt !== '') {
-      name = fieldOption.alt;
-      fieldDetails = event.Details.EventRegistrationFields
-        .find(field => field.FieldName.includes(fieldOption.alt));
-    }
-
     if (fieldDetails) {
       fieldDetails.AllowedValues.map(value => value.Label).forEach(option => {
         if (option) {
@@ -191,12 +182,12 @@ function getData(event, storedOptions, fieldOptions, registrationsCurrent) {
 
             let subFieldOptions = event.Details.EventRegistrationFields
               .find(field => field.FieldName.includes(fieldOption.sub))
-              .AllowedValues.map(value => value.Label.split(' ')).flat();
+              .AllowedValues
+                .filter(value => value.Label)
+                .map(value => value.Label.split(' ')).flat();
 
             subFieldOptions = [...new Set(subFieldOptions)]
               .filter(value => value.length > 5 && !value.includes(','));
-
-            subFieldOptions.push('(none)');
 
             subFieldOptions.forEach(suboption => {
               const limit = storedOptions.data?.find(stored => option.includes(stored.option) && suboption.includes(stored.suboption))?.limit || '';
@@ -208,7 +199,7 @@ function getData(event, storedOptions, fieldOptions, registrationsCurrent) {
 
               dataOptions.push({ name, option, suboption, limit, registered });
             });
-          } else if (!option.toLowerCase().includes('no thanks')) {
+          } else {
             const suboption = '';
             const limit = storedOptions.data?.find(stored => option.includes(stored.option))?.limit || '';
             const registered = registrationsCurrent[option] || 0;
@@ -250,16 +241,6 @@ function displayTable(tableData) {
       rowStyle += ' border-bottom: 2px solid #40b2cf;';
     }
 
-    if (data.limit && data.registered >= data.limit) {
-      const lineStyle = ' text-decoration: line-through';
-
-      if (data.suboption) {
-        suboptionStyle += lineStyle;
-      } else {
-        optionStyle += lineStyle;
-      }
-    }
-
     const input = `<input type="number" id="class-${i}" min="0" step="1" value="${data.limit}" placeholder="Unlimited" style="width: 80px">`;
 
     table.innerHTML += `
@@ -267,7 +248,7 @@ function displayTable(tableData) {
         <td style="${nameStyle}">${data.name}</td>
         <td style="${optionStyle}" colspan="${data.suboption ? 1 : 2}">${data.option}</td>
         ${data.suboption ? `<td style="${suboptionStyle}">${data.suboption}</td>` : ''}
-        <td>${data.suboption !== '(none)' ? input : ''}</td>
+        <td>${input}</td>
         <td style="opacity: 0.5">${data.registered || 0}</td>
       </tr>`;
 
