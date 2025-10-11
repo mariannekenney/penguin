@@ -1,6 +1,6 @@
-let isEarly, isMember, eventId, eventLimits, registrationData, emailRecipientIds;
+let isEarly, membershipLevel, eventId, eventLimits, registrationData, emailRecipientIds;
 
-export async function execute(backend, token, id) {
+export async function execute(id, backend, token) {
     eventId = id;
 
     registrationData = await backend.fetchEventRegistrations(token, eventId);
@@ -13,7 +13,7 @@ export async function execute(backend, token, id) {
     isEarly = Math.ceil(diffTime / (1000 * 60 * 60 * 24)) > 9;
 
     const userData = await backend.fetchUser();
-    isMember = userData?.MembershipLevel.Name !== 'Standard Penguin Account';
+    membershipLevel = userData?.MembershipLevel.Name;
 
     const userRegistrations = await backend.fetchUserRegistrations(token, userData.Id);
     if (userRegistrations && userRegistrations.length == 0) {
@@ -262,7 +262,7 @@ function sendWaitlistEmail(modal, emailRecipientIds, eventId) {
 }
 
 function becomeMember() {
-    if (isMember) {
+    if (!membershipLevel.includes('Standard')) {
         document.getElementsByClassName('captionOuterContainer')[0].style.display = 'none';
 
         Array.from(document.getElementsByClassName('fieldSubContainer'))
@@ -276,24 +276,42 @@ function becomeMember() {
 }
 
 function rainInsurance() {
-    if (!isEarly) {
-        const div = Array.from(document.getElementsByClassName('fieldSubContainer'))
-            .find(container => {
-                const label = container.querySelector('span[id*="titleLabel"]');
-                return label && label.textContent.includes('Rain Insurance');
-            });
+    const div = Array.from(document.getElementsByClassName('fieldSubContainer'))
+        .find(container => {
+            const label = container.querySelector('span[id*="titleLabel"]');
+            return label && label.textContent.includes('Rain Insurance');
+        });
 
-        if (div) {
-            div.querySelectorAll('div.fieldItem').forEach(item => {
-                const span = item.querySelector('span.textLine');
+    div.querySelectorAll('div.fieldItem').forEach(item => {
+        const span = item.querySelector('span.textLine');
 
-                if (span && !span.textContent.includes('No')) {
-                    span.style.textDecoration = 'line-through';
-                    item.querySelector('input').disabled = true;
-                }
-            });
+        let disable = false;
+        if (membershipLevel.includes('Plus')) {
+            if (span.textContent.includes('Plus')) {
+                item.querySelector('input').checked = true;
+            } else {
+                disable = true;
+            }
+        } else {
+            if (!isEarly || span.textContent.includes('Plus')) {
+                disable = true;
+            }
+
+            const ticketType = document.querySelector('.eventRegistrationInfoRegistrationType .infoText').textContent;
+            if (
+                (ticketType && !span.textContent.includes('Bike'))
+                && ((ticketType.includes('Racer') && !span.textContent.includes('Racer'))
+                || (!ticketType.includes('Racer') && span.textContent.includes('Racer')))
+            ) {
+                disable = true;
+            }
         }
-    }
+
+        if (disable) {
+            span.style.color = 'rgba(118, 118, 118, 0.8)';
+            item.querySelector('input').disabled = true;
+        }
+    });
 }
 
 function gearRentals() {
@@ -306,16 +324,14 @@ function gearRentals() {
         for (let i = 0; i < fieldContainers.length - 1; i += 2) {
             const checkboxes = fieldContainers[i].querySelectorAll('input[type="checkbox"]');
             
-            if (fieldContainers[i + 1]) {
-                const update = () => {
-                    const anyChecked = Array.from(checkboxes).some((checkbox) => checkbox.checked);
+            const update = () => {
+                const anyChecked = Array.from(checkboxes).some((checkbox) => checkbox.checked);
 
-                    fieldContainers[i + 1].style.display = anyChecked ? 'block' : 'none';
-                };
-                
-                update();
-                checkboxes.forEach((checkbox) => checkbox.addEventListener('change', update));
-            }
+                fieldContainers[i + 1].style.display = anyChecked ? 'block' : 'none';
+            };
+            
+            update();
+            checkboxes.forEach((checkbox) => checkbox.addEventListener('change', update));
         }
     }
 

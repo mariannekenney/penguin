@@ -65,7 +65,7 @@ async function execute() {
 
       // TO DO: CHANGE
       const code = await import(`https://mariannekenney.github.io/penguin/dev/src/event-registration/steps/${step}.js`);
-      await code.execute(backend, token, eventId);
+      await code.execute(eventId, backend, token);
     }
 
     toggleLoader(false);
