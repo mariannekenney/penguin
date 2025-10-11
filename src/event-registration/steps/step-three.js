@@ -15,12 +15,6 @@ export async function execute(id, backend, token) {
     const userData = await backend.fetchUser();
     membershipLevel = userData?.MembershipLevel.Name;
 
-    const userRegistrations = await backend.fetchUserRegistrations(token, userData.Id);
-    if (userRegistrations && userRegistrations.length == 0) {
-      const container = document.getElementById('idGeneralFormContainer');
-      container.innerHTML = document.getElementById('new-user-alert').innerHTML + container.innerHTML;
-    }
-
     emailRecipientIds = [27905286, 54159054, 27905257];
 
     styleSections();

@@ -149,16 +149,3 @@ export async function fetchGuestRegistration(token, registrationId) {
     console.error(error);
   }
 }
-
-export async function fetchUserRegistrations(token, userId) {
-  try {
-    const userRegistrations = await fetch(`https://api.wildapricot.org/v2.2/accounts/${WILD_APRICOT_ACCOUNT_ID}/eventregistrations?contactId=${userId}&$top=100`, {
-      method: 'GET',
-      headers: { 'Authorization': `Bearer ${token}` }
-    });
-
-    return await userRegistrations.json();
-  } catch (error) {
-    console.error(error);
-  }
-}
