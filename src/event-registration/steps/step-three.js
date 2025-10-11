@@ -67,10 +67,10 @@ function limitOptions() {
         item.limit = parseInt(item.limit);
 
         item.count = registrationData
-            .map(data =>
+            .map((data) =>
                 data.RegistrationFields.find(field => field.FieldName.includes(item.name))
             )
-            .filter(data => {
+            .filter((data) => {
                 const label = Array.isArray(data.Value) ? data.Value[0]?.Label : data.Value?.Label;
                 return label?.includes(item.option);
             }).length;
@@ -79,15 +79,15 @@ function limitOptions() {
     });
 
     eventData
-        .filter(data => data.limit && data.count >= data.limit)
+        .filter(data => data.limit !== "" && data.count >= data.limit)
         .forEach(data => {
             const field = Array.from(document.querySelectorAll('div[class*="fieldContainer"]'))
-                .filter(container =>
+                .filter((container) =>
                     container.querySelector('span[id*="titleLabel"]')?.textContent.includes(data.name)
                 )[0];
 
             field.querySelectorAll('div[class*="fieldItem"]')
-                .forEach(item => {
+                .forEach((item) => {
                     const label = item.querySelector('label');
 
                     if (label.textContent.includes(data.option)) {
@@ -121,13 +121,11 @@ function limitWithSubOptions() {
 
         const itemName = item.name.split(" & ");
         item.count = registrationData
-            .map(data =>
-            ({
+            .map((data) => ({
                 main: data.RegistrationFields.find(field => field.FieldName.includes(itemName[0])),
                 sub: data.RegistrationFields.find(field => field.FieldName.includes(itemName[1]))
-            })
-            )
-            .filter(data => {
+            }))
+            .filter((data) => {
                 const mainLabel = Array.isArray(data.main.Value) ? data.main.Value[0]?.Label : data.main.Value?.Label;
                 const subLabel = Array.isArray(data.sub.Value) ? data.sub.Value[0]?.Label : data.sub.Value?.Label;
 
@@ -141,16 +139,16 @@ function limitWithSubOptions() {
         const dataName = name.split(" & ");
         const fieldContainers = Array.from(document.querySelectorAll('div[class*="fieldContainer"]'));
 
-        const mainField = fieldContainers.filter(container =>
+        const mainField = fieldContainers.filter((container) =>
             container.querySelector('span[id*="titleLabel"]')?.textContent.includes(dataName[0])
         )[0];
 
-        const subField = fieldContainers.filter(container =>
+        const subField = fieldContainers.filter((container) =>
             container.querySelector('span[id*="titleLabel"]')?.textContent.includes(dataName[1])
         )[0];
 
         const startSelected = Array.from(mainField.querySelectorAll('div[class*="fieldItem"]'))
-            .filter(item => item.querySelector('input').checked);
+            .filter((item) => item.querySelector('input').checked);
 
         if (startSelected.length > 0) {
             const selectedLabel = startSelected[0].querySelector('label').textContent;
@@ -174,15 +172,15 @@ function limitWithSubOptions() {
 
 function handleSubOptions(selected, eventData, name, subField) {
     const limitSubOptions = eventData
-        .filter(data => name.includes(data.name) && selected.includes(data.option) && data.count >= data.limit)
-        .map(data => data.suboption);
+        .filter((data) => name.includes(data.name) && selected.includes(data.option) && data.count >= data.limit)
+        .map((data) => data.suboption);
 
     subField.querySelectorAll('div[class*="fieldItem"]').forEach(item => {
         item.querySelector('span.textLine').style = '';
         item.querySelector('input').disabled = false;
     });
 
-    limitSubOptions.forEach(suboption => {
+    limitSubOptions.forEach((suboption) => {
         subField.querySelectorAll('div[class*="fieldItem"]').forEach(item => {
             const label = item.querySelector('span.textLine');
 
@@ -204,7 +202,7 @@ function addWaitlist(soldOutField, soldOutNames) {
 
     const modal = document.querySelector('.custom-modal#waitlist');
 
-    soldOutNames.forEach(name => {
+    soldOutNames.forEach((name) => {
         modal.querySelector('#options').innerHTML += `
         <label style="display: block; margin-bottom: 10px">
           <input type="radio" name="sold-out" value="${name}"> ${name}
