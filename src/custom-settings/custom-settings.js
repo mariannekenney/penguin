@@ -1,3 +1,5 @@
+const WILD_APRICOT_DEV_ID = "__WILD_APRICOT_DEV_ID__";
+
 let backend, dataJSON;
 
 async function insertHTMLCSS() {
@@ -18,41 +20,22 @@ function toggleLoader(display) {
   document.getElementById('save').disabled = display;
 }
 
-function catchError(error) {
-  console.error(error);
-
-  document.getElementById('registration-management').innerHTML = `
-    <div id="registration-management-error">
-      <h3>Error Fetching Data</h3>
-      <p>Try refreshing the page, otherwise...</p>
-      <p>Open developer's console for more information or contact developer.</p>
-    <div>`;
-}
-
 async function deleteFile() {
-  try {
-    await fetch('/resources/Admin_Registration_Management.json', {
+  await fetch('/resources/Admin_Registration_Management.json', {
       method: 'DELETE'
     });
-  } catch (error) {
-    console.error(error);
-  }
 }
 
 async function uploadFile(file) {
-  try {
-    const body = new FormData();
-    body.append('file', file);
+  const body = new FormData();
+  body.append('file', file);
 
-    await fetch('/resources', {
-      method: 'POST',
-      body
-    });
+  await fetch('/resources', {
+    method: 'POST',
+    body
+  });
 
-    getEvents();
-  } catch (error) {
-    catchError(error);
-  }
+  getEvents();
 }
 
 function dataFromTable(tableId) {
@@ -180,6 +163,9 @@ function getData(event, storedOptions, fieldOptions, registrationsCurrent) {
           if (fieldOption.sub) {
             name = `${fieldOption.main} & ${fieldOption.sub}`;
 
+            console.log(fieldOption.sub, event.Details.EventRegistrationFields
+              .find(field => field.FieldName.includes(fieldOption.sub)))
+
             let subFieldOptions = event.Details.EventRegistrationFields
               .find(field => field.FieldName.includes(fieldOption.sub))
               .AllowedValues
@@ -272,46 +258,52 @@ function displayTable(tableData) {
 async function getEventData(eventId) {
   toggleLoader(true);
 
-  try {
-    const token = await backend.fetchToken();
-    const event = await backend.fetchEvent(eventId);
-    const registrations = await backend.fetchEventRegistrations(token, eventId);
+  const token = await backend.fetchToken();
+  const event = await backend.fetchEvent(eventId);
+  const registrations = await backend.fetchEventRegistrations(token, eventId);
 
-    const limits = dataJSON.data.find(data => data.eventId == eventId);
-    setupTable(event, (limits || []), registrations);
+  const limits = dataJSON.data.find(data => data.eventId == eventId);
+  setupTable(event, (limits || []), registrations);
 
-    toggleLoader(false);
+  toggleLoader(false);
 
-    document.getElementById('save').disabled = true;
-  } catch (error) {
-    catchError(error);
-  }
+  document.getElementById('save').disabled = true;
 }
 
 async function getEvents() {
   toggleLoader(true);
 
-  try {
-    const limits = await backend.fetchLimits();
-    const events = await backend.fetchAllEvents();
+  const limits = await backend.fetchLimits();
+  const events = await backend.fetchAllEvents();
 
-    const eventIds = events.Events.map(event => `${event.Id}`);
-    dataJSON = {
-      data: limits ? limits.data.filter(limit => eventIds.includes(`${limit.eventId}`)) : []
-    };
+  const eventIds = events.Events.map(event => `${event.Id}`);
+  dataJSON = {
+    data: limits ? limits.data.filter(limit => eventIds.includes(`${limit.eventId}`)) : []
+  };
 
-    eventDropdown(events.Events.reverse());
-  } catch (error) {
-    catchError(error);
-  }
+  eventDropdown(events.Events.reverse());
 }
 
 async function execute() {
-  // TO DO: CHANGE
-  backend = await import('https://mariannekenney.github.io/penguin/dev/src/backend.js');
+  let baseUrl = 'https://mariannekenney.github.io/penguin/src/'
+  if (localStorage.getItem('developer') === WILD_APRICOT_DEV_ID) {
+    baseUrl = baseUrl.split('src').join('dev/src');
+    console.log('DEV env .js');
+  }
+
+  backend = await import(`${baseUrl}backend.js`);
 
   await insertHTMLCSS();
   await getEvents();
 }
 
-execute();
+execute().catch((err) => {
+  console.error(err);
+
+  document.getElementById('registration-management').innerHTML = `
+    <div id="registration-management-error">
+      <h3>Error Fetching Data</h3>
+      <p>Try refreshing the page, otherwise...</p>
+      <p>Open developer's console for more information or contact developer.</p>
+    <div>`;
+})
