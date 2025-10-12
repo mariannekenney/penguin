@@ -26,114 +26,86 @@ export async function fetchHTMLCSS(paths) {
 }
 
 export async function fetchLimits() {
-  try {
-    const limits = await fetch('/resources/Admin_Registration_Management.json');
+  const limits = await fetch('/resources/Admin_Registration_Management.json');
 
-    return await limits.json();
-  } catch (error) {
-    console.error(error);
-  }
+  return await limits.json();
 }
 
 export async function fetchToken() {
   const base64 = btoa(`APIKEY:${WILD_APRICOT_API_KEY}`);
 
-  try {
-    const authResponse = await fetch('https://oauth.wildapricot.org/auth/token', {
-      method: 'POST',
-      headers: {
-        'Authorization': `Basic ${base64}`,
-        'Content-Type': 'application/x-www-form-urlencoded',
-      },
-      body: 'grant_type=client_credentials&scope=auto',
-    });
-    const authData = await authResponse.json();
+  const authResponse = await fetch('https://oauth.wildapricot.org/auth/token', {
+    method: 'POST',
+    headers: {
+      'Authorization': `Basic ${base64}`,
+      'Content-Type': 'application/x-www-form-urlencoded',
+    },
+    body: 'grant_type=client_credentials&scope=auto',
+  });
+  const authData = await authResponse.json();
 
-    return authData.access_token;
-  } catch (error) {
-    console.error(error);
-  }
+  return authData.access_token;
 }
 
 export async function fetchUser() {
-  try {
-    const user = await fetch(`/sys/api/v2/accounts/${WILD_APRICOT_ACCOUNT_ID}/contacts/me`, {
-      method: 'GET',
-      headers: { 'clientId': 'devUser' },
-      cache: 'no-store'
-    });
+  const user = await fetch(`/sys/api/v2/accounts/${WILD_APRICOT_ACCOUNT_ID}/contacts/me`, {
+    method: 'GET',
+    headers: { 'clientId': 'devUser' },
+    cache: 'no-store'
+  });
 
-    return await user.json();
-  } catch (error) {
-    console.error(error);
-  }
+  return await user.json();
 }
 
 export async function fetchAllEvents() {
-  try {
-    const allEvents = await fetch(`/sys/api/v2/accounts/${WILD_APRICOT_ACCOUNT_ID}/events?$filter=StartDate ge ${(new Date()).toISOString()}&$sort=ByStartDate asc`, {
-      method: 'GET',
-      headers: { 'clientId': 'devUser' },
-      cache: 'no-cache'
-    });
-    
-    return await allEvents.json();
-  } catch (error) {
-    console.error(error);
-  }
+  const allEvents = await fetch(`/sys/api/v2/accounts/${WILD_APRICOT_ACCOUNT_ID}/events?$filter=StartDate ge ${(new Date()).toISOString()}&$sort=ByStartDate asc`, {
+    method: 'GET',
+    headers: { 'clientId': 'devUser' },
+    cache: 'no-cache'
+  });
+  
+  return await allEvents.json();
 }
 
 export async function fetchEvent(eventId) {
-  try {
-    const event = await fetch(`/sys/api/v2/accounts/${WILD_APRICOT_ACCOUNT_ID}/events/${eventId}`, {
-      method: 'GET',
-      headers: { 'clientId': 'devUser' },
-      cache: 'no-cache'
-    });
+  const event = await fetch(`/sys/api/v2/accounts/${WILD_APRICOT_ACCOUNT_ID}/events/${eventId}`, {
+    method: 'GET',
+    headers: { 'clientId': 'devUser' },
+    cache: 'no-cache'
+  });
 
-    return await event.json();
-  } catch (error) {
-    console.error(error);
-  }
+  return await event.json();
 }
 
 export async function fetchEventRegistrations(token, eventId) {
-  try {
-    const eventRegistrations = await fetch(`https://api.wildapricot.org/v2.2/accounts/${WILD_APRICOT_ACCOUNT_ID}/eventregistrations?eventId=${eventId}`, {
-        method: 'GET',
-        headers: { 'Authorization': `Bearer ${token}` }
-      });
-
-    const registrations = await eventRegistrations.json();
-    
-    for (reg of registrations) {
-      const guests = reg.GuestRegistrationsSummary?.GuestRegistrations;
-      if (guests?.length > 0) {
-        for (guest of guests) {
-          const guestRegistration = await handleGuest(token, guest.Id);
-
-          if (guestRegistration) {
-            registrations.push(guestRegistration);
-          }
-        }
-      }
-    }
-
-    return registrations;
-  } catch (error) {
-    console.error(error);
-  }
-}
-
-export async function fetchGuestRegistration(token, registrationId) {
-  try {
-    const guestRegistration = await fetch(`https://api.wildapricot.org/v2.2/accounts/${WILD_APRICOT_ACCOUNT_ID}/eventregistrations/${registrationId}`, {
+  const eventRegistrations = await fetch(`https://api.wildapricot.org/v2.2/accounts/${WILD_APRICOT_ACCOUNT_ID}/eventregistrations?eventId=${eventId}`, {
       method: 'GET',
       headers: { 'Authorization': `Bearer ${token}` }
     });
 
-    return await guestRegistration.json();
-  } catch (error) {
-    console.error(error);
+  const registrations = await eventRegistrations.json();
+
+  for (reg of registrations) {
+    const guests = reg.GuestRegistrationsSummary?.GuestRegistrations;
+    if (guests?.length > 0) {
+      for (guest of guests) {
+        const guestRegistration = await handleGuest(token, guest.Id);
+
+        if (guestRegistration) {
+          registrations.push(guestRegistration);
+        }
+      }
+    }
   }
+
+  return registrations;
+}
+
+export async function fetchGuestRegistration(token, registrationId) {
+  const guestRegistration = await fetch(`https://api.wildapricot.org/v2.2/accounts/${WILD_APRICOT_ACCOUNT_ID}/eventregistrations/${registrationId}`, {
+    method: 'GET',
+    headers: { 'Authorization': `Bearer ${token}` }
+  });
+
+  return await guestRegistration.json();
 }

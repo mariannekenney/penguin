@@ -16,11 +16,8 @@ async function insertHTMLCSS(backend) {
 }
 
 function toggleLoader(display) {
-  let container = document.querySelector('#idGeneralFormContainer');
-  container.style.display = display ? 'none' : 'block';
-
-  container = document.querySelector('#loader-container');
-  container.style.display = display ? 'flex' : 'none';
+  document.getElementById('idGeneralFormContainer').style.display = display ? 'none' : 'block';
+  document.getElementById('loader-container').style.display = display ? 'flex' : 'none';
 }
 
 function watchForChanges() {
@@ -80,10 +77,13 @@ async function execute() {
     toggleLoader(false);
     watchForChanges();
   } else {
-    toggleLoader(false);
-
-    document.getElementById('idGeneralFormContainer').innerHTML = document.getElementById('user-login-alert').innerHTML;
+    document.getElementById('loader-container').style.display = 'none';
+    document.getElementById('user-login-alert').style.display = 'block';
   }
 }
 
-execute();
+execute().catch((err) => {
+  console.error(err);
+  document.getElementById('loader-container').style.display = 'none';
+  document.getElementById('custom-error-alert').style.display = 'block';
+});
