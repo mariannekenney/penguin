@@ -99,11 +99,13 @@ export async function fetchEvent(eventId) {
 
 export async function fetchEventRegistrations(token, eventId) {
   try {
-    const registrations = await fetch(`https://api.wildapricot.org/v2.2/accounts/${WILD_APRICOT_ACCOUNT_ID}/eventregistrations?eventId=${eventId}`, {
+    const eventRegistrations = await fetch(`https://api.wildapricot.org/v2.2/accounts/${WILD_APRICOT_ACCOUNT_ID}/eventregistrations?eventId=${eventId}`, {
         method: 'GET',
         headers: { 'Authorization': `Bearer ${token}` }
       });
 
+    const registrations = await eventRegistrations.json();
+    
     for (reg of registrations) {
       const guests = reg.GuestRegistrationsSummary?.GuestRegistrations;
       if (guests?.length > 0) {
