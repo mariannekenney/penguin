@@ -85,7 +85,7 @@ export async function fetchEventRegistrations(token, eventId) {
 
   const registrations = await eventRegistrations.json();
 
-  for (reg of registrations) {
+  for (let reg of registrations) {
     const guests = reg.GuestRegistrationsSummary?.GuestRegistrations;
     if (guests?.length > 0) {
       for (guest of guests) {
