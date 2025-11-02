@@ -6,7 +6,19 @@ export async function execute() {
 function styleSections() {
     document.querySelectorAll('.captionOuterContainer').forEach((section) => {
         const title = section.textContent.trim();
-        section.innerHTML = `<div class="custom-section"><span>${title}</span></div>`;
+        section.innerHTML = `
+            <div style="
+                display: flex;
+                justify-content: space-between;
+                padding: 10px;
+                border-top: 2px solid #008bae;
+                background-color: rgba(0, 139, 174, 0.1);
+                font-weight: bold;
+                font-size: 18px;
+                cursor: pointer;
+            ">
+                <span>${title}</span>
+            </div>`;
     });
 }
 
