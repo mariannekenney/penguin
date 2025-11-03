@@ -14,7 +14,7 @@ function styleSections() {
                 border-top: 2px solid #008bae;
                 background-color: rgba(0, 139, 174, 0.1);
                 font-weight: bold;
-                font-size: 18px;
+                font-size: 15px;
                 cursor: pointer;
             ">
                 <span>${title}</span>
