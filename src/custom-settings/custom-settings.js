@@ -158,42 +158,42 @@ function getData(event, storedOptions, fieldOptions, registrationsCurrent) {
       .find(field => field.FieldName.includes(fieldOption.main));
 
     if (fieldDetails) {
-      fieldDetails.AllowedValues.map(value => value.Label).forEach(option => {
-        if (option) {
-          if (fieldOption.sub) {
-            name = `${fieldOption.main} & ${fieldOption.sub}`;
+      fieldDetails.AllowedValues
+        .map(value => value.Label)
+        .filter(value => value && !value.includes('Equipment Only'))
+        .forEach(option => {
+          if (option) {
+            if (fieldOption.sub) {
+              name = `${fieldOption.main} & ${fieldOption.sub}`;
 
-            console.log(fieldOption.sub, event.Details.EventRegistrationFields
-              .find(field => field.FieldName.includes(fieldOption.sub)))
+              let subFieldOptions = event.Details.EventRegistrationFields
+                .find(field => field.FieldName.includes(fieldOption.sub))
+                .AllowedValues
+                  .filter(value => value.Label)
+                  .map(value => value.Label.split(' ')).flat();
 
-            let subFieldOptions = event.Details.EventRegistrationFields
-              .find(field => field.FieldName.includes(fieldOption.sub))
-              .AllowedValues
-                .filter(value => value.Label)
-                .map(value => value.Label.split(' ')).flat();
+              subFieldOptions = [...new Set(subFieldOptions)]
+                .filter(value => value.length > 5 && !value.includes(','));
 
-            subFieldOptions = [...new Set(subFieldOptions)]
-              .filter(value => value.length > 5 && !value.includes(','));
+              subFieldOptions.forEach(suboption => {
+                const limit = storedOptions.data?.find(stored => option.includes(stored.option) && suboption.includes(stored.suboption))?.limit || '';
+                let registered = 0;
+                const regristrations = Object.keys(registrationsCurrent)
+                  .filter(current => current.includes(option) && current.includes(suboption));
 
-            subFieldOptions.forEach(suboption => {
-              const limit = storedOptions.data?.find(stored => option.includes(stored.option) && suboption.includes(stored.suboption))?.limit || '';
-              let registered = 0;
-              const regristrations = Object.keys(registrationsCurrent)
-                .filter(current => current.includes(option) && current.includes(suboption));
+                regristrations.forEach(current => registered += registrationsCurrent[current]);
 
-              regristrations.forEach(current => registered += registrationsCurrent[current]);
+                dataOptions.push({ name, option, suboption, limit, registered });
+              });
+            } else {
+              const suboption = '';
+              const limit = storedOptions.data?.find(stored => option.includes(stored.option))?.limit || '';
+              const registered = registrationsCurrent[option] || 0;
 
               dataOptions.push({ name, option, suboption, limit, registered });
-            });
-          } else {
-            const suboption = '';
-            const limit = storedOptions.data?.find(stored => option.includes(stored.option))?.limit || '';
-            const registered = registrationsCurrent[option] || 0;
-
-            dataOptions.push({ name, option, suboption, limit, registered });
+            }
           }
-        }
-      });
+        });
     }
   });
 

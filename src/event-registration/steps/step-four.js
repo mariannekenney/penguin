@@ -34,4 +34,17 @@ function removeUnselected() {
             section.previousElementSibling.style.display = 'none';
         }
     });
+
+    const isEquipmentOnly = Array.from(document.querySelectorAll('.infoColumn'))
+        .some(value => value.textContent.includes('Equipment Only'))
+
+    if (isEquipmentOnly) {
+        Array.from(document.getElementsByClassName('captionOuterContainer'))
+            .forEach((container) => {
+                if (container.textContent.trim().includes('General')) {
+                    container.style.display = 'none';
+                    container.nextElementSibling.style.display = 'none';
+                }
+            });
+    }
 }

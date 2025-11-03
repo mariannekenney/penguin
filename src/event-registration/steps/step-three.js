@@ -265,12 +265,7 @@ function ticketTypeDependency() {
     const ticketType = document.querySelector('.eventRegistrationInfoRegistrationType .infoText').textContent;
 
     if (ticketType && ticketType.includes('Equipment Only')) {
-        document.querySelectorAll('.captionOuterContainer').forEach((container) => {
-            if (container.textContent.trim().includes('General')) {
-                container.style.display = 'none';
-                container.nextElementSibling.style.display = 'none';
-            }
-        });
+        handleEquipmentOnly();
     } else if (ticketType) {
         const div = Array.from(document.getElementsByClassName('fieldSubContainer'))
             .find(container => {
@@ -284,13 +279,41 @@ function ticketTypeDependency() {
             if (
                 (ticketType.includes('Racer') && !span.textContent.includes('Practice'))
                 || (!ticketType.includes('Racer') && span.textContent.includes('Practice'))
-                || (ticketType.includes('Wednesday') && span.textContent.includes('B - '))
             ) {
                 span.style.opacity = '0.5';
                 item.querySelector('input').disabled = true;
             }
         });
     }
+}
+
+function handleEquipmentOnly() {
+    const equipmentOnlyLabel = 'N/A (Equipment Only)';
+
+    Array.from(document.getElementsByClassName('fieldSubContainer'))
+        .forEach(container => {
+            const label = container.querySelector('span[id*="titleLabel"]');
+
+            if (label && (label.textContent.includes('Rider Level') || label.textContent.includes('Class Attending'))) {
+                container.querySelectorAll('div.fieldItem').forEach(item => {
+                    const span = item.querySelector('span.textLine');
+
+                    if (span.textContent.includes(equipmentOnlyLabel)) {
+                        item.querySelector('input').checked = true;
+                    }
+                });
+            } else if (label && (label.textContent.includes('Bike You Are Riding') || label.textContent.includes('Age of Rider'))) {
+                container.querySelector('input').value = equipmentOnlyLabel;
+            }
+        });
+
+    Array.from(document.getElementsByClassName('captionOuterContainer'))
+        .forEach((container) => {
+            if (container.textContent.trim().includes('General')) {
+                container.style.display = 'none';
+                container.nextElementSibling.style.display = 'none';
+            }
+        });
 }
 
 function becomeMember() {
