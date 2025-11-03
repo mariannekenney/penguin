@@ -4,8 +4,8 @@ let backend, dataJSON;
 
 async function insertHTMLCSS() {
   const html = await backend.fetchHTMLCSS([
-    'custom-settings/custom-settings.html',
-    'custom-settings/custom-settings.css',
+    'manage-registrations/manage-registrations.html',
+    'manage-registrations/manage-registrations.css',
     'style.css'
   ]);
 
