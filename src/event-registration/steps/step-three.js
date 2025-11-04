@@ -264,16 +264,17 @@ function sendWaitlistEmail(modal, emailRecipientIds, eventId) {
 function ticketTypeDependency() {
     const ticketType = document.querySelector('.eventRegistrationInfoRegistrationType .infoText').textContent;
 
-    if (ticketType && ticketType.includes('Equipment Only')) {
-        handleEquipmentOnly();
-    } else if (ticketType) {
-        const div = Array.from(document.getElementsByClassName('fieldSubContainer'))
+    const isEquipmentOnly = ticketType.includes('Equipment Only');
+    handleEquipmentOnly(isEquipmentOnly);
+
+    if (!isEquipmentOnly) {
+        const classAttending = Array.from(document.getElementsByClassName('fieldSubContainer'))
             .find(container => {
                 const label = container.querySelector('span[id*="titleLabel"]');
                 return label && label.textContent.includes('Class Attending');
             });
 
-        div.querySelectorAll('div.fieldItem').forEach(item => {
+        classAttending.querySelectorAll('div.fieldItem').forEach(item => {
             const span = item.querySelector('span.textLine');
 
             if (
@@ -287,7 +288,7 @@ function ticketTypeDependency() {
     }
 }
 
-function handleEquipmentOnly() {
+function handleEquipmentOnly(isEquipmentOnly) {
     const equipmentOnlyLabel = 'N/A (Equipment Only)';
 
     Array.from(document.getElementsByClassName('fieldSubContainer'))
@@ -299,21 +300,27 @@ function handleEquipmentOnly() {
                     const span = item.querySelector('span.textLine');
 
                     if (span.textContent.includes(equipmentOnlyLabel)) {
-                        item.querySelector('input').checked = true;
-                    }
+                        item.querySelector('input').checked = isEquipmentOnly;
+
+                        if (!isEquipmentOnly) {
+                            item.style.display = 'none';
+                        }
+                    }                    
                 });
             } else if (label && (label.textContent.includes('Bike You Are Riding') || label.textContent.includes('Age of Rider'))) {
-                container.querySelector('input').value = equipmentOnlyLabel;
+                container.querySelector('input').value = isEquipmentOnly ? equipmentOnlyLabel : '';
             }
         });
 
-    Array.from(document.getElementsByClassName('captionOuterContainer'))
-        .forEach((container) => {
-            if (container.textContent.trim().includes('General')) {
-                container.style.display = 'none';
-                container.nextElementSibling.style.display = 'none';
-            }
-        });
+    if (isEquipmentOnly) {
+        Array.from(document.getElementsByClassName('captionOuterContainer'))
+            .forEach((container) => {
+                if (container.textContent.trim().includes('General')) {
+                    container.style.display = 'none';
+                    container.nextElementSibling.style.display = 'none';
+                }
+            });
+    }
 }
 
 function becomeMember() {
