@@ -165,7 +165,11 @@ function limitWithSubOptions() {
 
         checkFields();
         mainField.addEventListener("change", checkFields);
-        mainField.querySelector('a.clearSelectionLabel').addEventListener("click", checkFields);
+
+        const clearLabel = mainField.querySelector('a.clearSelectionLabel');
+        if (clearLabel) {
+            clearLabel.addEventListener("click", checkFields);
+        }
     });
 }
 
