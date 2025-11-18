@@ -199,10 +199,9 @@ function handleSubOptions(selected, eventData, name, subField) {
 }
 
 function addWaitlist(soldOutField, soldOutNames) {
-    soldOutField.querySelector('div[id*="RadioGroup"]')
-        .innerHTML += `
+    soldOutField.querySelector('div[id*="RadioGroup"]').innerHTML += `
         <div style="margin-bottom: 10px">
-          <span>If your class is sold out... <button id="join-waitlist">Join the Waitlist</button></span>     
+          <button id="join-waitlist">Join the Waitlist</button>     
         </div>`;
 
     const modal = document.querySelector('.custom-modal#waitlist');
