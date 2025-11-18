@@ -34,8 +34,6 @@ async function uploadFile(file) {
     method: 'POST',
     body
   });
-
-  getEvents();
 }
 
 function dataFromTable(tableId) {
@@ -79,6 +77,7 @@ async function onSaveData() {
   toggleLoader(true);
   await deleteFile();
   await uploadFile(file);
+  await getEvents(eventId);
 }
 
 function saveData(eventId) {
@@ -103,7 +102,6 @@ function eventDropdown(events) {
   events.forEach(event => {
     dropdown.innerHTML += `<option value="${event.Id}">${event.Name}</option>`;
   });
-  getEventData(events[0].Id);
 
   dropdown?.addEventListener('change', function () {
     getEventData(this.value);
@@ -270,7 +268,7 @@ async function getEventData(eventId) {
   document.getElementById('save').disabled = true;
 }
 
-async function getEvents() {
+async function getEvents(eventId) {
   toggleLoader(true);
 
   const limits = await backend.fetchLimits();
@@ -281,7 +279,12 @@ async function getEvents() {
     data: limits ? limits.data.filter(limit => eventIds.includes(`${limit.eventId}`)) : []
   };
 
-  eventDropdown(events.Events.reverse());
+  if (eventId) {
+    await getEventData(eventId);
+  } else {
+    eventDropdown(events.Events.reverse());
+    await getEventData(eventIds[0]);
+  }
 }
 
 async function execute() {
