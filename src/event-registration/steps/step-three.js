@@ -367,7 +367,7 @@ function rainInsurance() {
 
             const ticketType = document.querySelector('.eventRegistrationInfoRegistrationType .infoText').textContent;
             if (
-                (ticketType && !span.textContent.includes('Bike'))
+                (ticketType && !ticketType.includes('Equipment Only') && !span.textContent.includes('Bike'))
                 && ((ticketType.includes('Racer') && !span.textContent.includes('Racer'))
                 || (!ticketType.includes('Racer') && span.textContent.includes('Racer')))
             ) {
