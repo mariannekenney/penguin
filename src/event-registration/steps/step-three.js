@@ -277,17 +277,20 @@ function ticketTypeDependency() {
                 return label && label.textContent.includes('Class Attending');
             });
 
-        classAttending.querySelectorAll('div.fieldItem').forEach(item => {
-            const span = item.querySelector('span.textLine');
+        const fieldItems = classAttending.querySelectorAll('div.fieldItem');
+        if (fieldItems.length > 5) {
+            fieldItems.forEach(item => {
+                const span = item.querySelector('span.textLine');
 
-            if (
-                (ticketType.includes('Racer') && !span.textContent.includes('Practice'))
-                || (!ticketType.includes('Racer') && span.textContent.includes('Practice'))
-            ) {
-                span.style.opacity = '0.5';
-                item.querySelector('input').disabled = true;
-            }
-        });
+                if (
+                    (ticketType.includes('Racer') && !span.textContent.includes('Practice'))
+                    || (!ticketType.includes('Racer') && span.textContent.includes('Practice'))
+                ) {
+                    span.style.opacity = '0.5';
+                    item.querySelector('input').disabled = true;
+                }
+            });
+        }
     }
 }
 
