@@ -64,8 +64,14 @@ async function registrationDetails() {
 	await code.execute();
 }
 
-if (window.location.href.includes('RegistrationsList')) {
-	registrationDetails();
+const href = window.location.href;
+if (href.includes('RegistrationsList')) {
+	const index = href.indexOf('RegistrationsList');
+	const nextChar = href.charAt(index + 'RegistrationsList'.length);
+
+	if (nextChar === '/') {
+		registrationDetails();
+	}
 } else {
 	execute();
 }

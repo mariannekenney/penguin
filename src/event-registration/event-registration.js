@@ -61,9 +61,9 @@ async function execute() {
       }
       
       step = "step-two";
-    } else if (title === 'Enter registration information') {
+    } else if (title === 'Enter registration information' || title === 'Enter guest registration information') {
       step = "step-three";
-    } else {
+    } else if (title === 'Registration information') {
       step = "step-four";
     }
 
@@ -72,10 +72,11 @@ async function execute() {
 
       const code = await import(`${baseUrl}event-registration/steps/${step}.js`);
       await code.execute(eventId, backend, token);
+    
+      watchForChanges();
     }
 
     toggleLoader(false);
-    watchForChanges();
   } else {
     document.getElementById('loader-container').style.display = 'none';
     document.getElementById('user-login-alert').style.display = 'block';
