@@ -283,8 +283,8 @@ function ticketTypeDependency() {
                 const span = item.querySelector('span.textLine');
 
                 if (
-                    (ticketType.includes('Racer') && !span.textContent.includes('Practice'))
-                    || (!ticketType.includes('Racer') && span.textContent.includes('Practice'))
+                    (ticketType.includes('Practice') && !span.textContent.includes('Practice'))
+                    || (!ticketType.includes('Practice') && span.textContent.includes('Practice'))
                 ) {
                     span.style.opacity = '0.5';
                     item.querySelector('input').disabled = true;
@@ -330,7 +330,7 @@ function handleEquipmentOnly(isEquipmentOnly) {
 }
 
 function becomeMember() {
-    if (!membershipLevel.includes('Standard')) {
+    if (!membershipLevel.toLowerCase().includes('standard')) {
         document.getElementsByClassName('captionOuterContainer')[0].style.display = 'none';
 
         Array.from(document.getElementsByClassName('fieldSubContainer'))
@@ -354,7 +354,7 @@ function rainInsurance() {
         const span = item.querySelector('span.textLine');
 
         let disable = false;
-        if (membershipLevel.includes('Plus')) {
+        if (membershipLevel.toLowerCase().includes('plus')) {
             if (span.textContent.includes('Plus')) {
                 item.querySelector('input').checked = true;
             } else {
@@ -368,8 +368,8 @@ function rainInsurance() {
             const ticketType = document.querySelector('.eventRegistrationInfoRegistrationType .infoText').textContent;
             if (
                 (ticketType && !ticketType.includes('Equipment Only') && !span.textContent.includes('Bike'))
-                && ((ticketType.includes('Racer') && !span.textContent.includes('Racer'))
-                || (!ticketType.includes('Racer') && span.textContent.includes('Racer')))
+                && ((ticketType.includes('Practice') && !span.textContent.includes('Practice'))
+                || (!ticketType.includes('Practice') && span.textContent.includes('Practice')))
             ) {
                 disable = true;
             }
