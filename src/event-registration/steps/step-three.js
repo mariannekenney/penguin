@@ -285,6 +285,7 @@ function ticketTypeDependency() {
                 if (
                     (ticketType.includes('Practice') && !span.textContent.includes('Practice'))
                     || (!ticketType.includes('Practice') && span.textContent.includes('Practice'))
+                    || (ticketType.includes('Full License') && span.textContent.includes('Racer'))
                 ) {
                     span.style.opacity = '0.5';
                     item.querySelector('input').disabled = true;
