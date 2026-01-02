@@ -282,7 +282,7 @@ async function getEvents(eventId) {
   if (eventId) {
     await getEventData(eventId);
   } else {
-    eventDropdown(events.Events.reverse());
+    eventDropdown(events.Events);
     await getEventData(eventIds[0]);
   }
 }
