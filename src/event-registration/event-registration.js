@@ -40,8 +40,14 @@ async function execute() {
   await insertHTMLCSS(backend);
   toggleLoader(true);
 
-  const token = await backend.fetchToken();
-  const userData = await backend.fetchUser();
+  let token, userData;
+  try {
+    token = await backend.fetchToken();
+    userData = await backend.fetchUser();
+  } catch (e) {
+    document.getElementById('loader-container').style.display = 'none';
+    document.getElementById('user-login-alert').style.display = 'block';
+  }
 
   if (userData) {
     const title = document.querySelector('h3.formTitle')?.textContent.trim();
@@ -77,9 +83,6 @@ async function execute() {
     }
 
     toggleLoader(false);
-  } else {
-    document.getElementById('loader-container').style.display = 'none';
-    document.getElementById('user-login-alert').style.display = 'block';
   }
 }
 

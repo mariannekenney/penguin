@@ -46,6 +46,7 @@ function sort() {
         'Wednesday - General',
         'Thursday - General',
         'Wednesday & Thursday - General',
+        'Wednesday - Racer',
         'Thursday - Racer',
         'General',
         'Racer',
