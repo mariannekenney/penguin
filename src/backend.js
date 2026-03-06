@@ -88,8 +88,8 @@ export async function fetchEventRegistrations(token, eventId) {
   for (let reg of registrations) {
     const guests = reg.GuestRegistrationsSummary?.GuestRegistrations;
     if (guests?.length > 0) {
-      for (guest of guests) {
-        const guestRegistration = await handleGuest(token, guest.Id);
+      for (let guest of guests) {
+        const guestRegistration = await fetchGuestRegistration(token, guest.Id);
 
         if (guestRegistration) {
           registrations.push(guestRegistration);
