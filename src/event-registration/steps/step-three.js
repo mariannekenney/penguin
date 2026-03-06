@@ -112,8 +112,8 @@ function limitWithSubOptions() {
         const itemName = item.name.split(" & ");
         item.count = registrationData
             .map((data) => ({
-                main: data.RegistrationFields.find(field => field.FieldName.includes(itemName[1])),
-                sub: data.RegistrationFields.find(field => field.FieldName.includes(itemName[0]))
+                main: data.RegistrationFields.find(field => field.FieldName.includes(itemName[0])),
+                sub: data.RegistrationFields.find(field => field.FieldName.includes(itemName[1]))
             }))
             .filter((data) => {
                 const mainLabel = Array.isArray(data.main.Value) ? data.main.Value[0]?.Label : data.main.Value?.Label;
