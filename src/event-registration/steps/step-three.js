@@ -1,424 +1,529 @@
-let isEarly, membershipLevel, eventId, eventLimits, registrationData, emailRecipientIds;
+let isEarly,
+  membershipLevel,
+  eventId,
+  eventLimits,
+  registrationData,
+  emailRecipientIds;
 
 export async function execute(id, backend, token) {
-    eventId = id;
+  eventId = id;
 
-    registrationData = await backend.fetchEventRegistrations(token, eventId);
+  registrationData = await backend.fetchEventRegistrations(token, eventId);
 
-    const allLimits = await backend.fetchLimits();
-    eventLimits = allLimits.data.find(eventsWithLimits => eventsWithLimits.eventId == eventId)?.data || [];
+  const allLimits = await backend.fetchLimits();
+  eventLimits =
+    allLimits.data.find(
+      (eventsWithLimits) => eventsWithLimits.eventId == eventId
+    )?.data || [];
 
-    const eventDate = document.querySelector('div[id*=InfoEndDateStartDateTimePanel').textContent.trim().split(" - ")[0];
-    const diffTime = Math.abs(new Date(eventDate) - new Date());
-    isEarly = Math.ceil(diffTime / (1000 * 60 * 60 * 24)) > 9;
+  const eventDate = document
+    .querySelector('div[id*=InfoEndDateStartDateTimePanel')
+    .textContent.trim()
+    .split(' - ')[0];
+  const diffTime = Math.abs(new Date(eventDate) - new Date());
+  isEarly = Math.ceil(diffTime / (1000 * 60 * 60 * 24)) > 9;
 
-    const userData = await backend.fetchUser();
-    membershipLevel = userData?.MembershipLevel.Name;
+  const userData = await backend.fetchUser();
+  membershipLevel = userData?.MembershipLevel.Name;
 
-    emailRecipientIds = [27905286, 54159054, 27905257];
+  emailRecipientIds = [27905286, 54159054, 27905257];
 
-    styleSections();
-    limitOptions();
-    limitWithSubOptions();
-    ticketTypeDependency();
-    becomeMember();
-    rainInsurance();
-    gearRentals();
-    cancellationTerms();
+  styleSections();
+  limitOptions();
+  limitWithSubOptions();
+  ticketTypeDependency();
+  becomeMember();
+  rainInsurance();
+  gearRentals();
+  cancellationTerms();
 }
 
 function styleSections() {
-    document.querySelectorAll('.captionOuterContainer').forEach((section) => {
-        const title = section.textContent.trim();
-        let sectionDisplay = `<div class="custom-section"><span>${title}</span>`;
-        if (!title.includes('Policies') && !title.includes('General') && !title.includes('LTF')) {
-            sectionDisplay += '<span class="custom-section-arrow open">❮</span>';
-        }
-        section.innerHTML = sectionDisplay + `</div>`;
+  document.querySelectorAll('.captionOuterContainer').forEach((section) => {
+    const title = section.textContent.trim();
+    let sectionDisplay = `<div class="custom-section"><span>${title}</span>`;
+    if (
+      !title.includes('Policies') &&
+      !title.includes('General') &&
+      !title.includes('LTF')
+    ) {
+      sectionDisplay += '<span class="custom-section-arrow open">❮</span>';
+    }
+    section.innerHTML = sectionDisplay + `</div>`;
 
-        section.addEventListener('click', () => {
-            const arrow = section.querySelector('.custom-section-arrow');
-            if (arrow) {
-                arrow.classList.toggle('open');
-                
-                const content = section.nextElementSibling;
-                content.style.display = (content.style.display === 'none') ? 'block' : 'none';
-            }
-        });
+    section.addEventListener('click', () => {
+      const arrow = section.querySelector('.custom-section-arrow');
+      if (arrow) {
+        arrow.classList.toggle('open');
+
+        const content = section.nextElementSibling;
+        content.style.display =
+          content.style.display === 'none' ? 'block' : 'none';
+      }
     });
+  });
 }
 
 function limitOptions() {
-    const waitlistedFields = ['Class Attending'];
-    const soldOutFields = [];
-    const soldOutNames = [];
+  const waitlistedFields = ['Class Attending'];
+  const soldOutFields = [];
+  const soldOutNames = [];
 
-    const eventData = eventLimits.filter(item => !item.suboption).map(item => {
-        item.limit = parseInt(item.limit);
+  const eventData = eventLimits
+    .filter((item) => !item.suboption)
+    .map((item) => {
+      item.limit = parseInt(item.limit);
 
-        item.count = registrationData
-            .map((data) =>
-                data.RegistrationFields.find(field => field.FieldName.includes(item.name))
-            )
-            .filter((data) => {
-                const label = Array.isArray(data.Value) ? data.Value[0]?.Label : data.Value?.Label;
-                return label?.includes(item.option);
-            }).length;
+      item.count = registrationData
+        .map((data) =>
+          data.RegistrationFields.find((field) =>
+            field.FieldName.includes(item.name)
+          )
+        )
+        .filter((data) => {
+          const label = Array.isArray(data.Value)
+            ? data.Value[0]?.Label
+            : data.Value?.Label;
+          return label?.includes(item.option);
+        }).length;
 
-        return item;
+      return item;
     });
 
-    eventData
-        .filter((data) => data.limit !== "" && data.count >= data.limit)
-        .forEach((data) => {
-            const field = Array.from(document.querySelectorAll('div[class*="fieldContainer"]'))
-                .filter((container) =>
-                    container.querySelector('span[id*="titleLabel"]')?.textContent.includes(data.name)
-                )[0];
+  eventData
+    .filter((data) => data.limit !== '' && data.count >= data.limit)
+    .forEach((data) => {
+      const field = Array.from(
+        document.querySelectorAll('div[class*="fieldContainer"]')
+      ).filter((container) =>
+        container
+          .querySelector('span[id*="titleLabel"]')
+          ?.textContent.includes(data.name)
+      )[0];
 
-            field.querySelectorAll('div[class*="fieldItem"]')
-                .forEach((item) => {
-                    const label = item.querySelector('span.textLine');
+      field.querySelectorAll('div[class*="fieldItem"]').forEach((item) => {
+        const label = item.querySelector('span.textLine');
 
-                    if (label.textContent.includes(data.option)) {
-                        label.style.opacity = '0.5';
-                        item.querySelector('input').disabled = true;
-                    }
-                });
-
-            if (waitlistedFields.includes(data.name)) {
-                if (!soldOutFields.includes(field)) soldOutFields.push(field);
-
-                const index = waitlistedFields.indexOf(data.name);
-                if (soldOutNames[index]) {
-                    soldOutNames[index].push(data.option);
-                } else {
-                    soldOutNames.push([data.option]);
-                }
-            }
-        });
-
-    waitlistedFields.forEach((_, i) => {
-        if (soldOutFields.length > 0) {
-            addWaitlist(soldOutFields[i], soldOutNames[i]);
+        if (label.textContent.includes(data.option)) {
+          label.style.opacity = '0.5';
+          item.querySelector('input').disabled = true;
         }
+      });
+
+      if (waitlistedFields.includes(data.name)) {
+        if (!soldOutFields.includes(field)) soldOutFields.push(field);
+
+        const index = waitlistedFields.indexOf(data.name);
+        if (soldOutNames[index]) {
+          soldOutNames[index].push(data.option);
+        } else {
+          soldOutNames.push([data.option]);
+        }
+      }
     });
+
+  waitlistedFields.forEach((_, i) => {
+    if (soldOutFields.length > 0) {
+      addWaitlist(soldOutFields[i], soldOutNames[i]);
+    }
+  });
 }
 
 function limitWithSubOptions() {
-    const eventData = eventLimits.filter((item) => item.suboption).map((item) => {
-        item.limit = parseInt(item.limit);
+  const eventData = eventLimits
+    .filter((item) => item.suboption)
+    .map((item) => {
+      item.limit = parseInt(item.limit);
 
-        const itemName = item.name.split(" & ");
-        item.count = registrationData
-            .map((data) => ({
-                main: data.RegistrationFields.find(field => field.FieldName.includes(itemName[0])),
-                sub: data.RegistrationFields.find(field => field.FieldName.includes(itemName[1]))
-            }))
-            .filter((data) => {
-                const mainLabel = Array.isArray(data.main.Value) ? data.main.Value[0]?.Label : data.main.Value?.Label;
-                const subLabel = Array.isArray(data.sub.Value) ? data.sub.Value[0]?.Label : data.sub.Value?.Label;
+      const itemName = item.name.split(' & ');
+      item.count = registrationData
+        .map((data) => ({
+          main: data.RegistrationFields.find((field) =>
+            field.FieldName.includes(itemName[0])
+          ),
+          sub: data.RegistrationFields.find((field) =>
+            field.FieldName.includes(itemName[1])
+          )
+        }))
+        .filter((data) => {
+          const mainLabel = Array.isArray(data.main.Value)
+            ? data.main.Value[0]?.Label
+            : data.main.Value?.Label;
+          const subLabel = Array.isArray(data.sub.Value)
+            ? data.sub.Value[0]?.Label
+            : data.sub.Value?.Label;
 
-                return mainLabel?.includes(item.option) && subLabel?.includes(item.suboption);
-            }).length;
+          return (
+            mainLabel?.includes(item.option) &&
+            subLabel?.includes(item.suboption)
+          );
+        }).length;
 
-        return item;
+      return item;
     });
 
-    [...new Set(eventData.map((data) => data.name))].forEach((name) => {
-        const dataName = name.split(" & ");
-        const fieldContainers = Array.from(document.querySelectorAll('div[class*="fieldContainer"]'));
+  [...new Set(eventData.map((data) => data.name))].forEach((name) => {
+    const dataName = name.split(' & ');
+    const fieldContainers = Array.from(
+      document.querySelectorAll('div[class*="fieldContainer"]')
+    );
 
-        const mainField = fieldContainers.filter((container) =>
-            container.querySelector('span[id*="titleLabel"]')?.textContent.includes(dataName[1])
-        )[0];
+    const mainField = fieldContainers.filter((container) =>
+      container
+        .querySelector('span[id*="titleLabel"]')
+        ?.textContent.includes(dataName[1])
+    )[0];
 
-        const subField = fieldContainers.filter((container) =>
-            container.querySelector('span[id*="titleLabel"]')?.textContent.includes(dataName[0])
-        )[0];
+    const subField = fieldContainers.filter((container) =>
+      container
+        .querySelector('span[id*="titleLabel"]')
+        ?.textContent.includes(dataName[0])
+    )[0];
 
-        const message = document.createElement('span');
-        message.textContent = 'Please select rental dates first.';
-        message.style.marginBottom = '8px';
-        message.style.fontStyle = 'italic';
-        subField.querySelector('a.clearSelectionLabel').after(message);
+    const message = document.createElement('span');
+    message.textContent = 'Please select rental dates first.';
+    message.style.marginBottom = '8px';
+    message.style.fontStyle = 'italic';
+    subField.querySelector('a.clearSelectionLabel').after(message);
 
-        const checkFields = () => {
-            const selectedField = Array.from(mainField.querySelectorAll('div[class*="fieldItem"]'))
-                .filter((item) => item.querySelector('input').checked);
+    const checkFields = () => {
+      const selectedField = Array.from(
+        mainField.querySelectorAll('div[class*="fieldItem"]')
+      ).filter((item) => item.querySelector('input').checked);
 
-            if (selectedField.length > 0) {
-                const selected = selectedField[0].querySelector('label').textContent;
-                handleSubOptions(selected, eventData, name, subField);
-            } else {
-                subField.querySelectorAll('div[class*="fieldItem"]').forEach(item => {
-                    item.querySelector('span.textLine').style.opacity = '0.5';
-                    item.querySelector('input').disabled = true;
-                    item.querySelector('input').checked = false;
-                });
-            }
+      if (selectedField.length > 0) {
+        const selected = selectedField[0].querySelector('label').textContent;
+        handleSubOptions(selected, eventData, name, subField);
+      } else {
+        subField.querySelectorAll('div[class*="fieldItem"]').forEach((item) => {
+          item.querySelector('span.textLine').style.opacity = '0.5';
+          item.querySelector('input').disabled = true;
+          item.querySelector('input').checked = false;
+        });
+      }
 
-            const clearSelection = subField.querySelector('a.clearSelectionLabel');
-            clearSelection.style.display = (selectedField.length > 0) ? 'block' : 'none';
-            clearSelection.nextElementSibling.style.display = (selectedField.length > 0) ? 'none' : 'block';
-        };
+      const clearSelection = subField.querySelector('a.clearSelectionLabel');
+      clearSelection.style.display =
+        selectedField.length > 0 ? 'block' : 'none';
+      clearSelection.nextElementSibling.style.display =
+        selectedField.length > 0 ? 'none' : 'block';
+    };
 
-        checkFields();
-        mainField.addEventListener("change", checkFields);
+    checkFields();
+    mainField.addEventListener('change', checkFields);
 
-        const clearLabel = mainField.querySelector('a.clearSelectionLabel');
-        if (clearLabel) {
-            clearLabel.addEventListener("click", checkFields);
-        }
-    });
+    const clearLabel = mainField.querySelector('a.clearSelectionLabel');
+    if (clearLabel) {
+      clearLabel.addEventListener('click', checkFields);
+    }
+  });
 }
 
 function handleSubOptions(selected, eventData, name, subField) {
-    const limitSubOptions = eventData
-        .filter((data) =>
-            name.includes(data.name) && selected.includes(data.suboption) && data.limit !== "" && data.count >= data.limit
-        )
-        .map((data) => data.option);
-    
-    subField.querySelectorAll('div[class*="fieldItem"]').forEach(item => {
-        item.querySelector('span.textLine').style.opacity = '1.0';
-        item.querySelector('input').disabled = false;
-    });
+  const limitSubOptions = eventData
+    .filter(
+      (data) =>
+        name.includes(data.name) &&
+        selected.includes(data.suboption) &&
+        data.limit !== '' &&
+        data.count >= data.limit
+    )
+    .map((data) => data.option);
 
-    limitSubOptions.forEach((option) => {
-        subField.querySelectorAll('div[class*="fieldItem"]').forEach(item => {
-            const label = item.querySelector('span.textLine');
+  subField.querySelectorAll('div[class*="fieldItem"]').forEach((item) => {
+    item.querySelector('span.textLine').style.opacity = '1.0';
+    item.querySelector('input').disabled = false;
+  });
 
-            if (label.textContent.includes(option)) {
-                label.style.opacity = '0.5';
-                item.querySelector('input').disabled = true;
-                item.querySelector('input').checked = false;
-            }
-        });
+  limitSubOptions.forEach((option) => {
+    subField.querySelectorAll('div[class*="fieldItem"]').forEach((item) => {
+      const label = item.querySelector('span.textLine');
+
+      if (label.textContent.includes(option)) {
+        label.style.opacity = '0.5';
+        item.querySelector('input').disabled = true;
+        item.querySelector('input').checked = false;
+      }
     });
+  });
 }
 
 function addWaitlist(soldOutField, soldOutNames) {
-    soldOutField.querySelector('div[id*="RadioGroup"]').innerHTML += `
+  soldOutField.querySelector('div[id*="RadioGroup"]').innerHTML += `
         <div style="margin-bottom: 10px">
-          <button id="join-waitlist">Join the Waitlist</button>     
+          <button id="join-waitlist">Join the Waitlist</button>
         </div>`;
 
-    const modal = document.querySelector('.custom-modal#waitlist');
+  const modal = document.querySelector('.custom-modal#waitlist');
 
-    soldOutNames.forEach((name) => {
-        modal.querySelector('#options').innerHTML += `
+  soldOutNames.forEach((name) => {
+    modal.querySelector('#options').innerHTML += `
         <label style="display: block; margin-bottom: 10px">
           <input type="radio" name="sold-out" value="${name}"> ${name}
         </label>`;
+  });
+
+  document
+    .getElementById('join-waitlist')
+    .addEventListener('click', (event) => {
+      event.preventDefault();
+      modal.showModal();
     });
 
-    document.getElementById('join-waitlist').addEventListener('click', (event) => {
-        event.preventDefault();
-        modal.showModal();
+  const recipientIds = emailRecipientIds;
+  modal
+    .querySelector('.modal-button#complete')
+    .addEventListener('click', (event) => {
+      event.preventDefault();
+      sendWaitlistEmail(modal, recipientIds, eventId);
     });
 
-    const recipientIds = emailRecipientIds;
-    modal.querySelector('.modal-button#complete').addEventListener('click', (event) => {
-        event.preventDefault();
-        sendWaitlistEmail(modal, recipientIds, eventId);
-    });
-
-    modal.querySelector('.modal-button#cancel').addEventListener('click', (event) => {
-        event.preventDefault();
-        modal.close();
+  modal
+    .querySelector('.modal-button#cancel')
+    .addEventListener('click', (event) => {
+      event.preventDefault();
+      modal.close();
     });
 }
 
 function sendWaitlistEmail(modal, emailRecipientIds, eventId) {
-    toggleLoader(true, modal.querySelector('#inner-content'));
+  toggleLoader(true, modal.querySelector('#inner-content'));
 
-    const selected = modal.querySelector('input[name="sold-out"]:checked').value;
-    const eventTitle = document.querySelector('.eventRegistrationInfoEvent .infoText').textContent.trim();
-    const firstName = document.querySelector(`input[id*="TextBox7652926"]`).value;
-    const lastName = document.querySelector(`input[id*="TextBox7652927"]`).value;
-    const email = document.querySelector(`input[id*="TextBox7652925"]`).value;
+  const selected = modal.querySelector('input[name="sold-out"]:checked').value;
+  const eventTitle = document
+    .querySelector('.eventRegistrationInfoEvent .infoText')
+    .textContent.trim();
+  const firstName = document.querySelector(`input[id*="TextBox7652926"]`).value;
+  const lastName = document.querySelector(`input[id*="TextBox7652927"]`).value;
+  const email = document.querySelector(`input[id*="TextBox7652925"]`).value;
 
-    const emailBody = `<div><h4>${eventTitle}</h4><p><strong>Class:</strong> ${selected}</p><p><strong>Registrant:</strong> ${firstName} ${lastName} (<a href="mailto:${email}">${email}</a>)</p></div>`;
+  const emailBody = `<div><h4>${eventTitle}</h4><p><strong>Class:</strong> ${selected}</p><p><strong>Registrant:</strong> ${firstName} ${lastName} (<a href="mailto:${email}">${email}</a>)</p></div>`;
 
-    const emailRecipients = emailRecipientIds.map(Id => ({ Id, Type: 'IndividualContactRecipient' }));
+  const emailRecipients = emailRecipientIds.map((Id) => ({
+    Id,
+    Type: 'IndividualContactRecipient'
+  }));
 
-    const emailData = {
-        Subject: 'Waitlist Request',
-        Body: emailBody,
-        Recipients: emailRecipients,
-        EventId: eventId
-    };
+  const emailData = {
+    Subject: 'Waitlist Request',
+    Body: emailBody,
+    Recipients: emailRecipients,
+    EventId: eventId
+  };
 
-    fetch(`https://api.wildapricot.org/v2.2/rpc/189391/email/sendEmail`, {
-        method: 'POST',
-        headers: { 'Authorization': `Bearer ${accessToken}`, 'Content-Type': 'application/json' },
-        body: JSON.stringify(emailData)
-    }).then(() => {
-        modal.querySelector('#message').innerHTML = `<span>Successfully added to the waitlist: <span style="font-style: italic">${selected}</span></span>`;
-        modal.querySelector('#options').style.display = 'none';
-        modal.querySelector('.modal-button#complete').style.display = 'none';
-        modal.querySelector('.modal-button#cancel').textContent = 'OK';
+  fetch(`https://api.wildapricot.org/v2.2/rpc/189391/email/sendEmail`, {
+    method: 'POST',
+    headers: {
+      Authorization: `Bearer ${accessToken}`,
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify(emailData)
+  }).then(() => {
+    modal.querySelector('#message').innerHTML =
+      `<span>Successfully added to the waitlist: <span style="font-style: italic">${selected}</span></span>`;
+    modal.querySelector('#options').style.display = 'none';
+    modal.querySelector('.modal-button#complete').style.display = 'none';
+    modal.querySelector('.modal-button#cancel').textContent = 'OK';
 
-        toggleLoader(false, modal.querySelector('#inner-content'));
-    });
+    toggleLoader(false, modal.querySelector('#inner-content'));
+  });
 }
 
 function ticketTypeDependency() {
-    const ticketType = document.querySelector('.eventRegistrationInfoRegistrationType .infoText').textContent;
+  const ticketType = document.querySelector(
+    '.eventRegistrationInfoRegistrationType .infoText'
+  ).textContent;
 
-    const isEquipmentOnly = ticketType.includes('Equipment Only');
-    handleEquipmentOnly(isEquipmentOnly);
+  const isEquipmentOnly = ticketType.includes('Equipment Only');
+  handleEquipmentOnly(isEquipmentOnly);
 
-    if (!isEquipmentOnly) {
-        const classAttending = Array.from(document.getElementsByClassName('fieldSubContainer'))
-            .find(container => {
-                const label = container.querySelector('span[id*="titleLabel"]');
-                return label && label.textContent.includes('Class Attending');
-            });
+  if (!isEquipmentOnly) {
+    const classAttending = Array.from(
+      document.getElementsByClassName('fieldSubContainer')
+    ).find((container) => {
+      const label = container.querySelector('span[id*="titleLabel"]');
+      return label && label.textContent.includes('Class Attending');
+    });
 
-        const fieldItems = classAttending.querySelectorAll('div.fieldItem');
-        if (fieldItems.length > 5) {
-            fieldItems.forEach(item => {
-                const span = item.querySelector('span.textLine');
+    const fieldItems = classAttending.querySelectorAll('div.fieldItem');
+    if (fieldItems.length > 5) {
+      fieldItems.forEach((item) => {
+        const span = item.querySelector('span.textLine');
 
-                if (
-                    (ticketType.includes('Practice') && !span.textContent.includes('Practice'))
-                    || (!ticketType.includes('Practice') && span.textContent.includes('Practice'))
-                    || (ticketType.includes('Full License') && span.textContent.includes('Racer'))
-                ) {
-                    span.style.opacity = '0.5';
-                    item.querySelector('input').disabled = true;
-                }
-            });
+        if (
+          (ticketType.includes('Practice') &&
+            !span.textContent.includes('Practice')) ||
+          (!ticketType.includes('Practice') &&
+            span.textContent.includes('Practice')) ||
+          (ticketType.includes('Full License') &&
+            span.textContent.includes('Racer'))
+        ) {
+          span.style.opacity = '0.5';
+          item.querySelector('input').disabled = true;
         }
+      });
     }
+  }
 }
 
 function handleEquipmentOnly(isEquipmentOnly) {
-    const equipmentOnlyLabel = 'N/A (Equipment Only)';
+  const equipmentOnlyLabel = 'N/A (Equipment Only)';
 
-    Array.from(document.getElementsByClassName('fieldSubContainer'))
-        .forEach(container => {
-            const label = container.querySelector('span[id*="titleLabel"]');
+  Array.from(document.getElementsByClassName('fieldSubContainer')).forEach(
+    (container) => {
+      const label = container.querySelector('span[id*="titleLabel"]');
 
-            if (label && (label.textContent.includes('Rider Level') || label.textContent.includes('Class Attending'))) {
-                container.querySelectorAll('div.fieldItem').forEach(item => {
-                    const span = item.querySelector('span.textLine');
+      if (
+        label &&
+        (label.textContent.includes('Rider Level') ||
+          label.textContent.includes('Class Attending'))
+      ) {
+        container.querySelectorAll('div.fieldItem').forEach((item) => {
+          const span = item.querySelector('span.textLine');
 
-                    if (span.textContent.includes(equipmentOnlyLabel)) {
-                        item.querySelector('input').checked = isEquipmentOnly;
+          if (span.textContent.includes(equipmentOnlyLabel)) {
+            item.querySelector('input').checked = isEquipmentOnly;
 
-                        if (!isEquipmentOnly) {
-                            item.style.display = 'none';
-                        }
-                    }                    
-                });
-            } else if (label && (label.textContent.includes('Bike You Are Riding') || label.textContent.includes('Age of Rider'))) {
-                container.querySelector('input').value = isEquipmentOnly ? equipmentOnlyLabel : '';
+            if (!isEquipmentOnly) {
+              item.style.display = 'none';
             }
+          }
         });
-
-    if (isEquipmentOnly) {
-        Array.from(document.getElementsByClassName('captionOuterContainer'))
-            .forEach((container) => {
-                if (container.textContent.trim().includes('General')) {
-                    container.style.display = 'none';
-                    container.nextElementSibling.style.display = 'none';
-                }
-            });
+      } else if (
+        label &&
+        (label.textContent.includes('Bike You Are Riding') ||
+          label.textContent.includes('Age of Rider'))
+      ) {
+        container.querySelector('input').value = isEquipmentOnly
+          ? equipmentOnlyLabel
+          : '';
+      }
     }
+  );
+
+  if (isEquipmentOnly) {
+    Array.from(
+      document.getElementsByClassName('captionOuterContainer')
+    ).forEach((container) => {
+      if (container.textContent.trim().includes('General')) {
+        container.style.display = 'none';
+        container.nextElementSibling.style.display = 'none';
+      }
+    });
+  }
 }
 
 function becomeMember() {
-    if (!membershipLevel.toLowerCase().includes('standard')) {
-        document.getElementsByClassName('captionOuterContainer')[0].style.display = 'none';
+  if (!membershipLevel.toLowerCase().includes('standard')) {
+    document.getElementsByClassName('captionOuterContainer')[0].style.display =
+      'none';
 
-        Array.from(document.getElementsByClassName('fieldSubContainer'))
-            .forEach(container => {
-                const label = container.querySelector('span[id*="titleLabel"]');
-                if (label && label.textContent.includes('Join Learn to Fly')) {
-                    container.style.display = 'none';
-                }
-            });
-    }
+    Array.from(document.getElementsByClassName('fieldSubContainer')).forEach(
+      (container) => {
+        const label = container.querySelector('span[id*="titleLabel"]');
+        if (label && label.textContent.includes('Join Learn to Fly')) {
+          container.style.display = 'none';
+        }
+      }
+    );
+  }
 }
 
 function rainInsurance() {
-    const div = Array.from(document.getElementsByClassName('fieldSubContainer'))
-        .find(container => {
-            const label = container.querySelector('span[id*="titleLabel"]');
-            return label && label.textContent.includes('Rain Insurance');
-        });
+  const div = Array.from(
+    document.getElementsByClassName('fieldSubContainer')
+  ).find((container) => {
+    const label = container.querySelector('span[id*="titleLabel"]');
+    return label && label.textContent.includes('Rain Insurance');
+  });
 
-    div.querySelectorAll('div.fieldItem').forEach(item => {
-        const span = item.querySelector('span.textLine');
+  div.querySelectorAll('div.fieldItem').forEach((item) => {
+    const span = item.querySelector('span.textLine');
 
-        let disable = false;
-        if (membershipLevel.toLowerCase().includes('plus')) {
-            if (span.textContent.includes('Plus')) {
-                item.querySelector('input').checked = true;
-            } else {
-                disable = true;
-            }
-        } else {
-            if (!isEarly || span.textContent.includes('Plus')) {
-                disable = true;
-            }
+    let disable = false;
+    if (membershipLevel.toLowerCase().includes('plus')) {
+      if (span.textContent.includes('Plus')) {
+        item.querySelector('input').checked = true;
+      } else {
+        disable = true;
+      }
+    } else {
+      if (!isEarly || span.textContent.includes('Plus')) {
+        disable = true;
+      }
 
-            const ticketType = document.querySelector('.eventRegistrationInfoRegistrationType .infoText').textContent;
-            if (
-                (ticketType && !ticketType.includes('Equipment Only') && !span.textContent.includes('Bike'))
-                && ((ticketType.includes('Practice') && !span.textContent.includes('Practice'))
-                || (!ticketType.includes('Practice') && span.textContent.includes('Practice')))
-            ) {
-                disable = true;
-            }
-        }
+      const ticketType = document.querySelector(
+        '.eventRegistrationInfoRegistrationType .infoText'
+      ).textContent;
+      if (
+        ticketType &&
+        !ticketType.includes('Equipment Only') &&
+        !span.textContent.includes('Bike') &&
+        ((ticketType.includes('Practice') &&
+          !span.textContent.includes('Practice')) ||
+          (!ticketType.includes('Practice') &&
+            span.textContent.includes('Practice')))
+      ) {
+        disable = true;
+      }
+    }
 
-        if (disable) {
-            span.style.opacity = '0.5';
-            item.querySelector('input').disabled = true;
-        }
-    });
+    if (disable) {
+      span.style.opacity = '0.5';
+      item.querySelector('input').disabled = true;
+    }
+  });
 }
 
 function gearRentals() {
-    const sectionHeader = Array.from(document.querySelectorAll('.captionOuterContainer'))
-        .find((section) => section.textContent.trim().includes('Gear Rentals'));
+  const sectionHeader = Array.from(
+    document.querySelectorAll('.captionOuterContainer')
+  ).find((section) => section.textContent.trim().includes('Gear Rentals'));
 
-    if (sectionHeader) {
-        const fieldContainers = Array.from(sectionHeader.nextElementSibling.querySelectorAll('.fieldContainer'));
+  if (sectionHeader) {
+    const fieldContainers = Array.from(
+      sectionHeader.nextElementSibling.querySelectorAll('.fieldContainer')
+    );
 
-        for (let i = 0; i < fieldContainers.length - 1; i += 2) {
-            const checkboxes = fieldContainers[i].querySelectorAll('input[type="checkbox"]');
-            
-            const update = () => {
-                const anyChecked = Array.from(checkboxes).some((checkbox) => checkbox.checked);
+    for (let i = 0; i < fieldContainers.length - 1; i += 2) {
+      const checkboxes = fieldContainers[i].querySelectorAll(
+        'input[type="checkbox"]'
+      );
 
-                fieldContainers[i + 1].style.display = anyChecked ? 'block' : 'none';
-            };
-            
-            update();
-            checkboxes.forEach((checkbox) => checkbox.addEventListener('change', update));
-        }
+      const update = () => {
+        const anyChecked = Array.from(checkboxes).some(
+          (checkbox) => checkbox.checked
+        );
+
+        fieldContainers[i + 1].style.display = anyChecked ? 'block' : 'none';
+      };
+
+      update();
+      checkboxes.forEach((checkbox) =>
+        checkbox.addEventListener('change', update)
+      );
     }
-
+  }
 }
 
 function cancellationTerms() {
-    const modal = document.querySelector('.custom-modal#cancellation');
+  const modal = document.querySelector('.custom-modal#cancellation');
 
-    if (modal) {
-        document.body.addEventListener('click', (event) => {
-            if (event.target && event.target.matches('input[id*="termsOfUseCheckBox"]')) {
-                if (event.target.checked) modal.showModal();
-            }
-        });
+  if (modal) {
+    document.body.addEventListener('click', (event) => {
+      if (
+        event.target &&
+        event.target.matches('input[id*="termsOfUseCheckBox"]')
+      ) {
+        if (event.target.checked) modal.showModal();
+      }
+    });
 
-        modal.querySelector('.modal-button#complete').addEventListener('click', (event) => {
-            event.preventDefault();
-            modal.close();
-        });
-    }
+    modal
+      .querySelector('.modal-button#complete')
+      .addEventListener('click', (event) => {
+        event.preventDefault();
+        modal.close();
+      });
+  }
 }

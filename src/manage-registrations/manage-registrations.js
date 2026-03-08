@@ -1,4 +1,4 @@
-const WILD_APRICOT_DEV_ID = "__WILD_APRICOT_DEV_ID__";
+const WILD_APRICOT_DEV_ID = '__WILD_APRICOT_DEV_ID__';
 
 let backend, dataJSON;
 
@@ -13,7 +13,9 @@ async function insertHTMLCSS() {
 }
 
 function toggleLoader(display) {
-  document.getElementById('loader-container').style.display = display ? 'flex' : 'none';
+  document.getElementById('loader-container').style.display = display
+    ? 'flex'
+    : 'none';
   document.getElementById('content').style.display = display ? 'none' : 'block';
 
   document.getElementById('dropdown').disabled = display;
@@ -22,8 +24,8 @@ function toggleLoader(display) {
 
 async function deleteFile() {
   await fetch('/resources/Admin_Registration_Management.json', {
-      method: 'DELETE'
-    });
+    method: 'DELETE'
+  });
 }
 
 async function uploadFile(file) {
@@ -38,26 +40,30 @@ async function uploadFile(file) {
 
 function dataFromTable(tableId) {
   const table = document.getElementById(tableId);
-  const headers = Array.from(table.querySelectorAll('thead th')).map(th => th.innerText.trim().toLowerCase());
+  const headers = Array.from(table.querySelectorAll('thead th')).map((th) =>
+    th.innerText.trim().toLowerCase()
+  );
   const rows = Array.from(table.querySelectorAll('tbody tr'));
 
-  const data = rows.map(row => {
+  const data = rows.map((row) => {
     const cells = row.querySelectorAll('td');
     let obj = {};
 
-    headers.filter(header => header !== 'registered').forEach((header, index) => {
-      header = header.toLowerCase().replace(' ', '');
-      const cell = cells[index];
-      if (header === 'limit') {
-        let input = cell.querySelector('input');
-        if (!input) {
-          input = cells[index - 1].querySelector('input');
+    headers
+      .filter((header) => header !== 'registered')
+      .forEach((header, index) => {
+        header = header.toLowerCase().replace(' ', '');
+        const cell = cells[index];
+        if (header === 'limit') {
+          let input = cell.querySelector('input');
+          if (!input) {
+            input = cells[index - 1].querySelector('input');
+          }
+          obj[header] = input ? input.value : null;
+        } else {
+          obj[header] = cell ? cell.innerText.trim() : null;
         }
-        obj[header] = input ? input.value : null;
-      } else {
-        obj[header] = cell ? cell.innerText.trim() : null;
-      }
-    });
+      });
 
     return obj;
   });
@@ -71,7 +77,7 @@ async function onSaveData() {
 
   const jsonString = JSON.stringify(dataJSON, null, 2);
   const file = new File([jsonString], 'Admin_Registration_Management.json', {
-    type: 'application/json',
+    type: 'application/json'
   });
 
   toggleLoader(true);
@@ -81,7 +87,7 @@ async function onSaveData() {
 }
 
 function saveData(eventId) {
-  const eventData = dataJSON.data.find(data => data.eventId == eventId);
+  const eventData = dataJSON.data.find((data) => data.eventId == eventId);
 
   updatedData = {
     eventId: eventId,
@@ -99,7 +105,7 @@ function eventDropdown(events) {
   const dropdown = document.getElementById('dropdown');
   dropdown.innerHTML = '';
 
-  events.forEach(event => {
+  events.forEach((event) => {
     dropdown.innerHTML += `<option value="${event.Id}">${event.Name}</option>`;
   });
 
@@ -109,17 +115,19 @@ function eventDropdown(events) {
 }
 
 function setupRegistrations(fieldOptions, registrationData) {
-  const fieldsOnly = registrationData.map(item => item.RegistrationFields);
+  const fieldsOnly = registrationData.map((item) => item.RegistrationFields);
   let registrationsCurrent = {};
 
-  fieldOptions.forEach(option => {
+  fieldOptions.forEach((option) => {
     const specifics = fieldsOnly.map((fields, i) => {
-      let field = fields.find(field => field.FieldName.includes(option.main));
-      let returnValue = field.Value ? (field.Value?.Label || field.Value[0]?.Label) : null;
+      let field = fields.find((field) => field.FieldName.includes(option.main));
+      let returnValue = field.Value
+        ? field.Value?.Label || field.Value[0]?.Label
+        : null;
 
       if (returnValue && option.sub) {
-        field = fields.find(field => field.FieldName.includes(option.sub));
-        returnValue = `${returnValue} && ${field.Value ? (field.Value?.Label || field.Value[0]?.Label) : null}`;
+        field = fields.find((field) => field.FieldName.includes(option.sub));
+        returnValue = `${returnValue} && ${field.Value ? field.Value?.Label || field.Value[0]?.Label : null}`;
       }
 
       return returnValue;
@@ -141,51 +149,78 @@ function setupTable(event, storedOptions, registrations) {
     { main: 'Class Attending', sub: '' },
     { main: 'Data Driven Coaching', sub: '' },
     { main: 'Bike Selection', sub: 'Rental Dates' },
-    { main: 'Discounted Dunlop Tires', sub: '' },
+    { main: 'Discounted Dunlop Tires', sub: '' }
   ];
 
-  displayTable(getData(event, storedOptions, fieldOptions, setupRegistrations(fieldOptions, registrations)));
+  displayTable(
+    getData(
+      event,
+      storedOptions,
+      fieldOptions,
+      setupRegistrations(fieldOptions, registrations)
+    )
+  );
 }
 
 function getData(event, storedOptions, fieldOptions, registrationsCurrent) {
   const dataOptions = [];
 
-  fieldOptions.forEach(fieldOption => {
+  fieldOptions.forEach((fieldOption) => {
     let name = fieldOption.main;
-    let fieldDetails = event.Details.EventRegistrationFields
-      .find(field => field.FieldName.includes(fieldOption.main));
+    let fieldDetails = event.Details.EventRegistrationFields.find((field) =>
+      field.FieldName.includes(fieldOption.main)
+    );
 
     if (fieldDetails) {
-      fieldDetails.AllowedValues
-        .map(value => value.Label)
-        .filter(value => value && !value.includes('Equipment Only'))
-        .forEach(option => {
+      fieldDetails.AllowedValues.map((value) => value.Label)
+        .filter((value) => value && !value.includes('Equipment Only'))
+        .forEach((option) => {
           if (option) {
             if (fieldOption.sub) {
               name = `${fieldOption.main} & ${fieldOption.sub}`;
 
-              let subFieldOptions = event.Details.EventRegistrationFields
-                .find(field => field.FieldName.includes(fieldOption.sub))
-                .AllowedValues
-                  .filter(value => value.Label)
-                  .map(value => value.Label.split(' ')).flat();
+              let subFieldOptions = event.Details.EventRegistrationFields.find(
+                (field) => field.FieldName.includes(fieldOption.sub)
+              )
+                .AllowedValues.filter((value) => value.Label)
+                .map((value) => value.Label.split(' '))
+                .flat();
 
-              subFieldOptions = [...new Set(subFieldOptions)]
-                .filter(value => value.length > 5 && !value.includes(','));
+              subFieldOptions = [...new Set(subFieldOptions)].filter(
+                (value) => value.length > 5 && !value.includes(',')
+              );
 
-              subFieldOptions.forEach(suboption => {
-                const limit = storedOptions.data?.find(stored => option.includes(stored.option) && suboption.includes(stored.suboption))?.limit || '';
+              subFieldOptions.forEach((suboption) => {
+                const limit =
+                  storedOptions.data?.find(
+                    (stored) =>
+                      option.includes(stored.option) &&
+                      suboption.includes(stored.suboption)
+                  )?.limit || '';
                 let registered = 0;
-                const regristrations = Object.keys(registrationsCurrent)
-                  .filter(current => current.includes(option) && current.includes(suboption));
+                const regristrations = Object.keys(registrationsCurrent).filter(
+                  (current) =>
+                    current.includes(option) && current.includes(suboption)
+                );
 
-                regristrations.forEach(current => registered += registrationsCurrent[current]);
+                regristrations.forEach(
+                  (current) => (registered += registrationsCurrent[current])
+                );
 
-                dataOptions.push({ name, option, suboption, limit, registered });
+                dataOptions.push({
+                  name,
+                  option,
+                  suboption,
+                  limit,
+                  registered
+                });
               });
             } else {
               const suboption = '';
-              const limit = storedOptions.data?.find(stored => option.includes(stored.option))?.limit || '';
+              const limit =
+                storedOptions.data?.find((stored) =>
+                  option.includes(stored.option)
+                )?.limit || '';
               const registered = registrationsCurrent[option] || 0;
 
               dataOptions.push({ name, option, suboption, limit, registered });
@@ -205,7 +240,8 @@ function displayTable(tableData) {
   tableData.forEach((data, i) => {
     const isSameName = data.name === tableData[i - 1]?.name;
     const isSameOption = data.option === tableData[i - 1]?.option;
-    const sameColumnStyle = 'border-bottom: none; border-top: none; color: white';
+    const sameColumnStyle =
+      'border-bottom: none; border-top: none; color: white';
 
     let rowStyle = '';
     let nameStyle = sameColumnStyle;
@@ -221,7 +257,7 @@ function displayTable(tableData) {
       optionStyle = 'border-bottom: none;';
     }
 
-    if (i == (tableData.length - 1)) {
+    if (i == tableData.length - 1) {
       rowStyle += ' border-bottom: 2px solid #40b2cf;';
     }
 
@@ -260,8 +296,8 @@ async function getEventData(eventId) {
   const event = await backend.fetchEvent(eventId);
   const registrations = await backend.fetchEventRegistrations(token, eventId);
 
-  const limits = dataJSON.data.find(data => data.eventId == eventId);
-  setupTable(event, (limits || []), registrations);
+  const limits = dataJSON.data.find((data) => data.eventId == eventId);
+  setupTable(event, limits || [], registrations);
 
   toggleLoader(false);
 
@@ -274,9 +310,11 @@ async function getEvents(eventId) {
   const limits = await backend.fetchLimits();
   const events = await backend.fetchAllEvents();
 
-  const eventIds = events.Events.map(event => `${event.Id}`);
+  const eventIds = events.Events.map((event) => `${event.Id}`);
   dataJSON = {
-    data: limits ? limits.data.filter(limit => eventIds.includes(`${limit.eventId}`)) : []
+    data: limits
+      ? limits.data.filter((limit) => eventIds.includes(`${limit.eventId}`))
+      : []
   };
 
   if (eventId) {
@@ -288,7 +326,7 @@ async function getEvents(eventId) {
 }
 
 async function execute() {
-  let baseUrl = 'https://mariannekenney.github.io/penguin/src/'
+  let baseUrl = 'https://mariannekenney.github.io/penguin/src/';
   if (localStorage.getItem('developer') === WILD_APRICOT_DEV_ID) {
     baseUrl = baseUrl.split('src').join('dev/src');
     console.log('DEV env .js');
@@ -309,4 +347,4 @@ execute().catch((err) => {
       <p>Try refreshing the page, otherwise...</p>
       <p>Open developer's console for more information or contact developer.</p>
     <div>`;
-})
+});

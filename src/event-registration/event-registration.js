@@ -1,4 +1,4 @@
-const WILD_APRICOT_DEV_ID = "__WILD_APRICOT_DEV_ID__";
+const WILD_APRICOT_DEV_ID = '__WILD_APRICOT_DEV_ID__';
 
 async function insertHTMLCSS(backend) {
   const html = await backend.fetchHTMLCSS([
@@ -7,17 +7,22 @@ async function insertHTMLCSS(backend) {
     'style.css'
   ]);
 
-  const container = document.getElementById('idRegistrationFormContainer')
-    || document.getElementById('idSelectRegistrationTypeContainer')
-    || document.getElementById('idIdentifyUserContainer')
-    || document.getElementById('idEventRegistrationConfirmationContainer');
+  const container =
+    document.getElementById('idRegistrationFormContainer') ||
+    document.getElementById('idSelectRegistrationTypeContainer') ||
+    document.getElementById('idIdentifyUserContainer') ||
+    document.getElementById('idEventRegistrationConfirmationContainer');
 
   container.innerHTML += html;
 }
 
 function toggleLoader(display) {
-  document.getElementById('idGeneralFormContainer').style.display = display ? 'none' : 'block';
-  document.getElementById('loader-container').style.display = display ? 'flex' : 'none';
+  document.getElementById('idGeneralFormContainer').style.display = display
+    ? 'none'
+    : 'block';
+  document.getElementById('loader-container').style.display = display
+    ? 'flex'
+    : 'none';
 }
 
 function watchForChanges() {
@@ -25,11 +30,15 @@ function watchForChanges() {
     execute();
   });
 
-  observer.observe(document.querySelector('h3.formTitle'), { childList: true, subtree: true, attributes: true });
+  observer.observe(document.querySelector('h3.formTitle'), {
+    childList: true,
+    subtree: true,
+    attributes: true
+  });
 }
 
 async function execute() {
-  let baseUrl = 'https://mariannekenney.github.io/penguin/src/'
+  let baseUrl = 'https://mariannekenney.github.io/penguin/src/';
   if (localStorage.getItem('developer') === WILD_APRICOT_DEV_ID) {
     baseUrl = baseUrl.split('src').join('dev/src');
     console.log('DEV env .js');
@@ -65,20 +74,27 @@ async function execute() {
       if (back) {
         back.style.display = 'none';
       }
-      
-      step = "step-two";
-    } else if (title === 'Enter registration information' || title === 'Enter guest registration information') {
-      step = "step-three";
+
+      step = 'step-two';
+    } else if (
+      title === 'Enter registration information' ||
+      title === 'Enter guest registration information'
+    ) {
+      step = 'step-three';
     } else if (title === 'Registration information') {
-      step = "step-four";
+      step = 'step-four';
     }
 
     if (step) {
-      const eventId = document.querySelector('a[href*="event-"]')?.href.split('event-')[1];
+      const eventId = document
+        .querySelector('a[href*="event-"]')
+        ?.href.split('event-')[1];
 
-      const code = await import(`${baseUrl}event-registration/steps/${step}.js`);
+      const code = await import(
+        `${baseUrl}event-registration/steps/${step}.js`
+      );
       await code.execute(eventId, backend, token);
-    
+
       watchForChanges();
     }
 
