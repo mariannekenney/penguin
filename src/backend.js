@@ -2,7 +2,7 @@ const WILD_APRICOT_API_KEY = '__WILD_APRICOT_API_KEY__';
 const WILD_APRICOT_ACCOUNT_ID = '__WILD_APRICOT_ACCOUNT_ID__';
 const WILD_APRICOT_DEV_ID = '__WILD_APRICOT_DEV_ID__';
 
-export async function fetchHTMLCSS(paths) {
+async function fetchHTMLCSS(paths) {
   let links = paths.map(
     (path) => `https://mariannekenney.github.io/penguin/src/${path}`
   );
@@ -27,13 +27,13 @@ export async function fetchHTMLCSS(paths) {
   return html;
 }
 
-export async function fetchLimits() {
+async function fetchLimits() {
   const limits = await fetch('/resources/Admin_Registration_Management.json');
 
   return await limits.json();
 }
 
-export async function fetchToken() {
+async function fetchToken() {
   const base64 = btoa(`APIKEY:${WILD_APRICOT_API_KEY}`);
 
   const authResponse = await fetch('https://oauth.wildapricot.org/auth/token', {
@@ -49,7 +49,7 @@ export async function fetchToken() {
   return authData.access_token;
 }
 
-export async function fetchUser() {
+async function fetchUser() {
   const user = await fetch(
     `/sys/api/v2/accounts/${WILD_APRICOT_ACCOUNT_ID}/contacts/me`,
     {
@@ -62,7 +62,7 @@ export async function fetchUser() {
   return await user.json();
 }
 
-export async function fetchAllEvents() {
+async function fetchAllEvents() {
   const allEvents = await fetch(
     `/sys/api/v2/accounts/${WILD_APRICOT_ACCOUNT_ID}/events?$filter=StartDate ge ${new Date().toISOString()}&$sort=ByStartDate asc`,
     {
@@ -75,7 +75,7 @@ export async function fetchAllEvents() {
   return await allEvents.json();
 }
 
-export async function fetchEvent(eventId) {
+async function fetchEvent(eventId) {
   const event = await fetch(
     `/sys/api/v2/accounts/${WILD_APRICOT_ACCOUNT_ID}/events/${eventId}`,
     {
@@ -88,7 +88,7 @@ export async function fetchEvent(eventId) {
   return await event.json();
 }
 
-export async function fetchEventRegistrations(token, eventId) {
+async function fetchEventRegistrations(token, eventId) {
   const eventRegistrations = await fetch(
     `https://api.wildapricot.org/v2.2/accounts/${WILD_APRICOT_ACCOUNT_ID}/eventregistrations?eventId=${eventId}`,
     {
@@ -115,7 +115,7 @@ export async function fetchEventRegistrations(token, eventId) {
   return registrations;
 }
 
-export async function fetchGuestRegistration(token, registrationId) {
+async function fetchGuestRegistration(token, registrationId) {
   const guestRegistration = await fetch(
     `https://api.wildapricot.org/v2.2/accounts/${WILD_APRICOT_ACCOUNT_ID}/eventregistrations/${registrationId}`,
     {

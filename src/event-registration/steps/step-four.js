@@ -1,4 +1,4 @@
-export async function execute() {
+async function execute() {
   styleSections();
   removeUnselected();
 }

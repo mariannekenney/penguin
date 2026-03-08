@@ -1,4 +1,4 @@
-export function execute() {
+function execute() {
   filter();
   sort();
 }

@@ -5,7 +5,7 @@ let isEarly,
   registrationData,
   emailRecipientIds;
 
-export async function execute(id, backend, token) {
+async function execute(id, backend, token) {
   eventId = id;
 
   registrationData = await backend.fetchEventRegistrations(token, eventId);
