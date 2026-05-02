@@ -58,12 +58,12 @@ export async function fetchUser() {
 }
 
 export async function fetchAllEvents() {
-  const allEvents = await fetch(`/sys/api/v2/accounts/${WILD_APRICOT_ACCOUNT_ID}/events?$filter=StartDate ge ${(new Date()).toISOString()}&$sort=ByStartDate asc`, {
+  const allEvents = await fetch(`/sys/api/v2/accounts/${WILD_APRICOT_ACCOUNT_ID}/events?$filter=StartDate ge ${(new Date(new Date().getFullYear(), 0, 1)).toISOString()}&$sort=ByStartDate asc`, {
     method: 'GET',
     headers: { 'clientId': 'devUser' },
     cache: 'no-cache'
   });
-  
+
   return await allEvents.json();
 }
 
@@ -78,27 +78,44 @@ export async function fetchEvent(eventId) {
 }
 
 export async function fetchEventRegistrations(token, eventId) {
-  const eventRegistrations = await fetch(`https://api.wildapricot.org/v2.2/accounts/${WILD_APRICOT_ACCOUNT_ID}/eventregistrations?eventId=${eventId}`, {
-      method: 'GET',
-      headers: { 'Authorization': `Bearer ${token}` }
-    });
+  try {
+    const allRegistrations = [];
+    let offset = 0;
+    const limit = 100;
 
-  const registrations = await eventRegistrations.json();
+    while (true) {
+      const eventRegistrations = await fetch(`https://api.wildapricot.org/v2.2/accounts/${WILD_APRICOT_ACCOUNT_ID}/eventregistrations?eventId=${eventId}&$skip=${offset}`, {
+          method: 'GET',
+          headers: { 'Authorization': `Bearer ${token}` }
+        });
 
-  for (let reg of registrations) {
-    const guests = reg.GuestRegistrationsSummary?.GuestRegistrations;
-    if (guests?.length > 0) {
-      for (let guest of guests) {
-        const guestRegistration = await fetchGuestRegistration(token, guest.Id);
+      const registrations = await eventRegistrations.json();
 
-        if (guestRegistration) {
-          registrations.push(guestRegistration);
+      allRegistrations.push(...registrations);
+
+      if (registrations.length < limit) {
+        break;
+      }
+      offset += registrations.length;
+    }
+
+    for (let reg of allRegistrations) {
+      const guests = reg.GuestRegistrationsSummary?.GuestRegistrations;
+      if (guests?.length > 0) {
+        for (let guest of guests) {
+          const guestRegistration = await fetchGuestRegistration(token, guest.Id);
+
+          if (guestRegistration) {
+            allRegistrations.push(guestRegistration);
+          }
         }
       }
     }
-  }
 
-  return registrations;
+    return allRegistrations;
+  } catch (error) {
+    console.error(error);
+  }
 }
 
 export async function fetchGuestRegistration(token, registrationId) {

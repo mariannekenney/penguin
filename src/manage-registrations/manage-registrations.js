@@ -95,7 +95,7 @@ function saveData(eventId) {
   }
 }
 
-function eventDropdown(events) {
+function eventDropdown(events, eventId) {
   const dropdown = document.getElementById('dropdown');
   dropdown.innerHTML = '';
 
@@ -106,6 +106,10 @@ function eventDropdown(events) {
   dropdown?.addEventListener('change', function () {
     getEventData(this.value);
   });
+
+  if (eventId) {
+    dropdown.value = eventId;
+  }
 }
 
 function setupRegistrations(fieldOptions, registrationData) {
@@ -282,8 +286,9 @@ async function getEvents(eventId) {
   if (eventId) {
     await getEventData(eventId);
   } else {
-    eventDropdown(events.Events);
-    await getEventData(eventIds[0]);
+    const defaultEventId = events.Events.filter(event => event.StartDate > (new Date(Date.now() - 24 * 60 * 60 * 1000)).toISOString()).map(event => `${event.Id}`)[0];
+    eventDropdown(events.Events, defaultEventId);
+    await getEventData(defaultEventId);
   }
 }
 
