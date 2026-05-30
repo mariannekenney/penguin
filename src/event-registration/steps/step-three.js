@@ -277,8 +277,8 @@ function ticketTypeDependency() {
                 return label && label.textContent.includes('Class Attending');
             });
 
-        const fieldItems = classAttending.querySelectorAll('div.fieldItem');
-        if (fieldItems.length > 5) {
+        const fieldItems = classAttending?.querySelectorAll('div.fieldItem');
+        if (fieldItems?.length > 5) {
             fieldItems.forEach(item => {
                 const span = item.querySelector('span.textLine');
 
@@ -332,15 +332,19 @@ function handleEquipmentOnly(isEquipmentOnly) {
 
 function becomeMember() {
     if (!membershipLevel.toLowerCase().includes('standard')) {
-        document.getElementsByClassName('captionOuterContainer')[0].style.display = 'none';
+        const container = document.getElementsByClassName('captionOuterContainer')[0];
 
-        Array.from(document.getElementsByClassName('fieldSubContainer'))
-            .forEach(container => {
-                const label = container.querySelector('span[id*="titleLabel"]');
-                if (label && label.textContent.includes('Join Learn to Fly')) {
-                    container.style.display = 'none';
-                }
-            });
+      if (container) {
+            container.style.display = 'none';
+
+            Array.from(document.getElementsByClassName('fieldSubContainer'))
+                .forEach(container => {
+                    const label = container.querySelector('span[id*="titleLabel"]');
+                    if (label && label.textContent.includes('Join Learn to Fly')) {
+                        container.style.display = 'none';
+                    }
+                });
+        }
     }
 }
 
@@ -351,7 +355,7 @@ function rainInsurance() {
             return label && label.textContent.includes('Rain Insurance');
         });
 
-    div.querySelectorAll('div.fieldItem').forEach(item => {
+    div?.querySelectorAll('div.fieldItem').forEach(item => {
         const span = item.querySelector('span.textLine');
 
         let disable = false;

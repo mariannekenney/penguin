@@ -17,7 +17,9 @@ function execute() {
 		.map(element => element.textContent.trim())
 		.some(label => label.includes('LTF'));
 
-	document.querySelectorAll('.registrationInfo li').forEach(item => {
+	const options = Array.from(document.querySelectorAll('.registrationInfo li'));
+	const hasEarlyBird = options.map(item => item.querySelector('regTypeLiLabel')?.textContent.trim()).includes('Early-Bird');
+	options.forEach(item => {
 		const label = item.querySelector('.regTypeLiLabel').textContent.trim();
 
 		if (isEarlyBird == undefined) {
@@ -27,7 +29,7 @@ function execute() {
 				item.style.display = 'none';
 			}
 
-			if ((label.includes('Early-Bird') && !isEarlyBird) || (!label.includes('Early-Bird') && isEarlyBird)) {
+			if (hasEarlyBird && ((label.includes('Early-Bird') && !isEarlyBird) || (!label.includes('Early-Bird') && isEarlyBird))) {
 				item.style.display = 'none';
 			}
 		}

@@ -21,7 +21,9 @@ function filter() {
         .map(element => element.textContent.trim())
         .some(label => label.includes('LTF'));
 
-    document.querySelectorAll('.eventRegistrationTypeRadioWrapper').forEach(item => {
+    const options = Array.from(document.querySelectorAll('.eventRegistrationTypeRadioWrapper'))
+    const hasEarlyBird = options.map(item => item.querySelector('label').textContent.trim()).includes('Early-Bird');
+    options.forEach(item => {
         const label = item.querySelector('label').textContent.trim();
 
         if (isEarlyBird == undefined) {
@@ -31,7 +33,7 @@ function filter() {
                 item.style.display = 'none';
             }
 
-            if ((label.includes('Early-Bird') && !isEarlyBird) || (!label.includes('Early-Bird') && isEarlyBird)) {
+            if (hasEarlyBird && ((label.includes('Early-Bird') && !isEarlyBird) || (!label.includes('Early-Bird') && isEarlyBird))) {
                 item.style.display = 'none';
             }
         }
