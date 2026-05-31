@@ -21,8 +21,8 @@ function filter() {
         .map(element => element.textContent.trim())
         .some(label => label.includes('LTF'));
 
-    const options = Array.from(document.querySelectorAll('.eventRegistrationTypeRadioWrapper'))
-    const hasEarlyBird = options.map(item => item.querySelector('label').textContent.trim()).includes('Early-Bird');
+    const options = Array.from(document.querySelectorAll('.eventRegistrationTypeRadioWrapper'));
+    const hasEarlyBird = options.map(item => item.querySelector('label').textContent.trim()).some(label => label.includes('Early-Bird'));
     options.forEach(item => {
         const label = item.querySelector('label').textContent.trim();
 
