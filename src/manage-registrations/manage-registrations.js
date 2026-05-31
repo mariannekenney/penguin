@@ -119,11 +119,17 @@ function setupRegistrations(fieldOptions, registrationData) {
   fieldOptions.forEach(option => {
     const specifics = fieldsOnly.map((fields, i) => {
       let field = fields.find(field => field.FieldName.includes(option.main));
-      let returnValue = field.Value ? (field.Value?.Label || field.Value[0]?.Label) : null;
+
+      if (!field && option.alt) {
+        field = fields.find(field => field.FieldName.includes(option.alt));
+      }
+      let returnValue = field?.Value ? (field.Value?.Label || field.Value[0]?.Label) : null;
 
       if (returnValue && option.sub) {
         field = fields.find(field => field.FieldName.includes(option.sub));
-        returnValue = `${returnValue} && ${field.Value ? (field.Value?.Label || field.Value[0]?.Label) : null}`;
+        if (field) {
+          returnValue = `${returnValue} && ${field.Value ? (field.Value?.Label || field.Value[0]?.Label) : null}`;
+        }
       }
 
       return returnValue;
@@ -142,7 +148,7 @@ function setupRegistrations(fieldOptions, registrationData) {
 
 function setupTable(event, storedOptions, registrations) {
   const fieldOptions = [
-    { main: 'Class Attending', sub: '' },
+    { main: 'Class Attending', alt: 'Rider Level', sub: '' },
     { main: 'Data Driven Coaching', sub: '' },
     { main: 'Bike Selection', sub: 'Rental Dates' },
     { main: 'Discounted Dunlop Tires', sub: '' },
@@ -159,6 +165,14 @@ function getData(event, storedOptions, fieldOptions, registrationsCurrent) {
     let fieldDetails = event.Details.EventRegistrationFields
       .find(field => field.FieldName.includes(fieldOption.main));
 
+    if (!fieldDetails && fieldOption.alt) {
+      fieldDetails = event.Details.EventRegistrationFields
+        .find(field => field.FieldName.includes(fieldOption.alt));
+      if (fieldDetails) {
+        name = fieldOption.alt;
+      }
+    }
+
     if (fieldDetails) {
       fieldDetails.AllowedValues
         .map(value => value.Label)
@@ -166,27 +180,30 @@ function getData(event, storedOptions, fieldOptions, registrationsCurrent) {
         .forEach(option => {
           if (option) {
             if (fieldOption.sub) {
-              name = `${fieldOption.main} & ${fieldOption.sub}`;
+              name = `${name} & ${fieldOption.sub}`;
 
-              let subFieldOptions = event.Details.EventRegistrationFields
-                .find(field => field.FieldName.includes(fieldOption.sub))
-                .AllowedValues
+              let subFieldDetails = event.Details.EventRegistrationFields
+                .find(field => field.FieldName.includes(fieldOption.sub));
+
+              if (subFieldDetails) {
+                let subFieldOptions = subFieldDetails.AllowedValues
                   .filter(value => value.Label)
                   .map(value => value.Label.split(' ')).flat();
 
-              subFieldOptions = [...new Set(subFieldOptions)]
-                .filter(value => value.length > 5 && !value.includes(','));
+                subFieldOptions = [...new Set(subFieldOptions)]
+                  .filter(value => value.length > 5 && !value.includes(','));
 
-              subFieldOptions.forEach(suboption => {
-                const limit = storedOptions.data?.find(stored => option.includes(stored.option) && suboption.includes(stored.suboption))?.limit || '';
-                let registered = 0;
-                const regristrations = Object.keys(registrationsCurrent)
-                  .filter(current => current.includes(option) && current.includes(suboption));
+                subFieldOptions.forEach(suboption => {
+                  const limit = storedOptions.data?.find(stored => option.includes(stored.option) && suboption.includes(stored.suboption))?.limit || '';
+                  let registered = 0;
+                  const regristrations = Object.keys(registrationsCurrent)
+                    .filter(current => current.includes(option) && current.includes(suboption));
 
-                regristrations.forEach(current => registered += registrationsCurrent[current]);
+                  regristrations.forEach(current => registered += registrationsCurrent[current]);
 
-                dataOptions.push({ name, option, suboption, limit, registered });
-              });
+                  dataOptions.push({ name, option, suboption, limit, registered });
+                });
+              }
             } else {
               const suboption = '';
               const limit = storedOptions.data?.find(stored => option.includes(stored.option))?.limit || '';
