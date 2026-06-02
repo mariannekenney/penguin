@@ -160,11 +160,14 @@ function limitWithSubOptions() {
 
         const itemName = item.name.split(" & ");
         item.count = registrationData
+            .filter((data) => data.RegistrationFields)
             .map((data) => ({
                 main: data.RegistrationFields.find(field => field.FieldName.includes(itemName[0])),
                 sub: data.RegistrationFields.find(field => field.FieldName.includes(itemName[1]))
             }))
             .filter((data) => {
+                if (!data.main || !data.sub) return false;
+                
                 const mainLabel = Array.isArray(data.main.Value) ? data.main.Value[0]?.Label : data.main.Value?.Label;
                 const subLabel = Array.isArray(data.sub.Value) ? data.sub.Value[0]?.Label : data.sub.Value?.Label;
 
@@ -186,11 +189,16 @@ function limitWithSubOptions() {
             container.querySelector('span[id*="titleLabel"]')?.textContent.includes(dataName[0])
         )[0];
 
-        const message = document.createElement('span');
-        message.textContent = 'Please select rental dates first.';
-        message.style.marginBottom = '8px';
-        message.style.fontStyle = 'italic';
-        subField.querySelector('a.clearSelectionLabel').after(message);
+        if (!mainField || !subField) return;
+
+        const clearSelectionLabel = subField.querySelector('a.clearSelectionLabel');
+        if (clearSelectionLabel) {
+            const message = document.createElement('span');
+            message.textContent = 'Please select rental dates first.';
+            message.style.marginBottom = '8px';
+            message.style.fontStyle = 'italic';
+            clearSelectionLabel.after(message);
+        }
 
         const checkFields = () => {
             const selectedField = Array.from(mainField.querySelectorAll('div[class*="fieldItem"]'))
@@ -208,8 +216,12 @@ function limitWithSubOptions() {
             }
 
             const clearSelection = subField.querySelector('a.clearSelectionLabel');
-            clearSelection.style.display = (selectedField.length > 0) ? 'block' : 'none';
-            clearSelection.nextElementSibling.style.display = (selectedField.length > 0) ? 'none' : 'block';
+            if (clearSelection) {
+                clearSelection.style.display = (selectedField.length > 0) ? 'block' : 'none';
+                if (clearSelection.nextElementSibling) {
+                    clearSelection.nextElementSibling.style.display = (selectedField.length > 0) ? 'none' : 'block';
+                }
+            }
         };
 
         checkFields();
