@@ -177,7 +177,14 @@ function setupTable(event, storedOptions, registrations) {
     { main: 'Discounted Dunlop Tires', sub: '' },
   ];
 
-  displayTable(getData(event, storedOptions, fieldOptions, setupRegistrations(fieldOptions, registrations)));
+  const eventEndDate = new Date(event.EndDate);
+  const isPastEvent = eventEndDate < new Date();
+
+  displayTable(getData(event, storedOptions, fieldOptions, setupRegistrations(fieldOptions, registrations)), isPastEvent);
+  
+  if (isPastEvent) {
+    document.getElementById('save').disabled = true;
+  }
 }
 
 function getData(event, storedOptions, fieldOptions, registrationsCurrent) {
@@ -276,7 +283,7 @@ function getData(event, storedOptions, fieldOptions, registrationsCurrent) {
   return dataOptions;
 }
 
-function displayTable(tableData) {
+function displayTable(tableData, isPastEvent = false) {
   const table = document.getElementById('table-body');
   table.innerHTML = '';
 
@@ -303,7 +310,7 @@ function displayTable(tableData) {
       rowStyle += ' border-bottom: 2px solid #40b2cf;';
     }
 
-    const input = `<input type="number" id="class-${i}" min="0" step="1" value="${data.limit}" placeholder="Unlimited" style="width: 80px">`;
+    const input = `<input type="number" id="class-${i}" min="0" step="1" value="${data.limit}" placeholder="Unlimited" style="width: 80px" ${isPastEvent ? 'disabled' : ''}>`;
 
     table.innerHTML += `
       <tr style="${rowStyle}">
@@ -317,7 +324,7 @@ function displayTable(tableData) {
     setTimeout(() => {
       const input = document.getElementById(`class-${i}`);
 
-      if (input) {
+      if (input && !isPastEvent) {
         input.addEventListener('input', function () {
           this.style.borderColor = '#40b2cf';
           document.getElementById('save').disabled = false;
@@ -343,7 +350,12 @@ async function getEventData(eventId) {
 
   toggleLoader(false);
 
-  document.getElementById('save').disabled = true;
+  const eventEndDate = new Date(event.EndDate);
+  const isPastEvent = eventEndDate < new Date();
+  
+  if (!isPastEvent) {
+    document.getElementById('save').disabled = true;
+  }
 }
 
 async function getEvents(eventId) {
