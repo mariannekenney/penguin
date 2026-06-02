@@ -53,42 +53,91 @@ function limitOptions() {
     const soldOutFields = [];
     const soldOutNames = [];
 
+    const endDateText = document.querySelector('.eventRegistrationInfoEndDate')?.textContent || '';
+    const is2DayEvent = endDateText.includes('-');
+    
+    const ticketType = document.querySelector('.eventRegistrationInfoRegistrationType .infoText')?.textContent || '';
+    const userHasWed = ticketType.includes('Wednesday');
+    const userHasThu = ticketType.includes('Thursday');
+
     const eventData = eventLimits.filter(item => !item.suboption).map(item => {
         item.limit = parseInt(item.limit);
-
         item.count = registrationData
-            .map((data) =>
-                data.RegistrationFields.find(field => field.FieldName.includes(item.name))
-            )
-            .filter((data) => {
+            .map(data => data.RegistrationFields.find(field => field.FieldName.includes(item.name)))
+            .filter(data => {
                 const label = Array.isArray(data.Value) ? data.Value[0]?.Label : data.Value?.Label;
                 return label?.includes(item.option);
             }).length;
-
         return item;
     });
 
+    if (is2DayEvent && (userHasWed || userHasThu)) {
+        const classField = Array.from(document.querySelectorAll('div[class*="fieldContainer"]'))
+            .find(c => c.querySelector('span[id*="titleLabel"]')?.textContent.includes('Class Attending'));
+        
+        if (classField) {
+            const classOptions = [];
+            classField.querySelectorAll('div[class*="fieldItem"]').forEach(item => {
+                const label = item.querySelector('span.textLine');
+                const option = label.textContent.trim();
+                
+                const daysToCheck = option.startsWith('P') ? ['Thursday'] : ['Wednesday', 'Thursday'];
+                const userDays = [];
+                if (userHasWed) userDays.push('Wednesday');
+                if (userHasThu) userDays.push('Thursday');
+                const relevantDays = daysToCheck.filter(d => userDays.includes(d));
+                
+                let atCapacity = false;
+                relevantDays.forEach(day => {
+                    const limitEntry = eventLimits.find(l => 
+                        l.name === 'Class Attending' && l.option === option && l.suboption === day
+                    );
+                    
+                    const count = registrationData.filter(reg => {
+                        const field = reg.RegistrationFields.find(f => f.FieldName.includes('Class Attending'));
+                        const value = field?.Value ? (Array.isArray(field.Value) ? field.Value[0]?.Label : field.Value?.Label) : null;
+                        const regType = reg.RegistrationType?.Name || '';
+                        return value?.includes(option) && regType.includes(day);
+                    }).length;
+                    
+                    if (limitEntry && limitEntry.limit !== '' && count >= parseInt(limitEntry.limit)) {
+                        atCapacity = true;
+                    }
+                });
+                
+                if (atCapacity) {
+                    label.style.opacity = '0.5';
+                    item.querySelector('input').disabled = true;
+                    classOptions.push(option);
+                }
+            });
+            
+            if (classOptions.length > 0) {
+                soldOutFields.push(classField);
+                soldOutNames.push(classOptions);
+            }
+        }
+    }
+
     eventData
-        .filter((data) => data.limit !== "" && data.count >= data.limit)
-        .forEach((data) => {
+        .filter(data => !(is2DayEvent && data.name === 'Class Attending'))
+        .filter(data => data.limit !== "" && data.count >= data.limit)
+        .forEach(data => {
             const field = Array.from(document.querySelectorAll('div[class*="fieldContainer"]'))
-                .filter((container) =>
+                .filter(container =>
                     container.querySelector('span[id*="titleLabel"]')?.textContent.includes(data.name)
                 )[0];
 
-            field.querySelectorAll('div[class*="fieldItem"]')
-                .forEach((item) => {
-                    const label = item.querySelector('span.textLine');
-
-                    if (label.textContent.includes(data.option)) {
-                        label.style.opacity = '0.5';
-                        item.querySelector('input').disabled = true;
-                    }
-                });
+            field.querySelectorAll('div[class*="fieldItem"]').forEach(item => {
+                const label = item.querySelector('span.textLine');
+                if (label.textContent.includes(data.option)) {
+                    label.style.opacity = '0.5';
+                    item.querySelector('input').disabled = true;
+                }
+            });
 
             if (waitlistedFields.includes(data.name)) {
                 if (!soldOutFields.includes(field)) soldOutFields.push(field);
-
                 const index = waitlistedFields.indexOf(data.name);
                 if (soldOutNames[index]) {
                     soldOutNames[index].push(data.option);

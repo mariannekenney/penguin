@@ -117,13 +117,33 @@ function setupRegistrations(fieldOptions, registrationData) {
   let registrationsCurrent = {};
 
   fieldOptions.forEach(option => {
-    const specifics = fieldsOnly.map((fields, i) => {
+    const specifics = fieldsOnly.flatMap((fields, i) => {
       let field = fields.find(field => field.FieldName.includes(option.main));
+      let foundFieldName = option.main;
 
       if (!field && option.alt) {
         field = fields.find(field => field.FieldName.includes(option.alt));
+        if (field) {
+          foundFieldName = option.alt;
+        }
       }
       let returnValue = field?.Value ? (field.Value?.Label || field.Value[0]?.Label) : null;
+
+      // Append day information for Class Attending/Rider Level fields
+      if (returnValue && (foundFieldName.includes('Class Attending') || foundFieldName.includes('Rider Level'))) {
+        const registrationTypeName = registrationData[i]?.RegistrationType?.Name || '';
+        const hasWednesday = registrationTypeName.includes('Wednesday');
+        const hasThursday = registrationTypeName.includes('Thursday');
+        
+        if (hasWednesday && hasThursday) {
+          // Return both days as separate entries with field name prefix
+          return [`${foundFieldName}: ${returnValue} && Wednesday`, `${foundFieldName}: ${returnValue} && Thursday`];
+        } else if (hasWednesday) {
+          returnValue = `${returnValue} && Wednesday`;
+        } else if (hasThursday) {
+          returnValue = `${returnValue} && Thursday`;
+        }
+      }
 
       if (returnValue && option.sub) {
         field = fields.find(field => field.FieldName.includes(option.sub));
@@ -132,12 +152,15 @@ function setupRegistrations(fieldOptions, registrationData) {
         }
       }
 
-      return returnValue;
+      // Prefix with field name to avoid collisions between different fields
+      return returnValue ? `${foundFieldName}: ${returnValue}` : null;
     });
 
     const optionMap = {};
     for (const item of specifics) {
-      optionMap[item] = (optionMap[item] || 0) + 1;
+      if (item) {
+        optionMap[item] = (optionMap[item] || 0) + 1;
+      }
     }
 
     registrationsCurrent = Object.assign({}, registrationsCurrent, optionMap);
@@ -160,6 +183,12 @@ function setupTable(event, storedOptions, registrations) {
 function getData(event, storedOptions, fieldOptions, registrationsCurrent) {
   const dataOptions = [];
 
+  // Detect if this is a 2-day event (has both Wednesday and Thursday registration types)
+  const registrationTypes = event.Details.RegistrationTypes || [];
+  const hasWednesday = registrationTypes.some(type => type.Name.includes('Wednesday'));
+  const hasThursday = registrationTypes.some(type => type.Name.includes('Thursday'));
+  const is2DayEvent = hasWednesday && hasThursday;
+
   fieldOptions.forEach(fieldOption => {
     let name = fieldOption.main;
     let fieldDetails = event.Details.EventRegistrationFields
@@ -174,6 +203,8 @@ function getData(event, storedOptions, fieldOptions, registrationsCurrent) {
     }
 
     if (fieldDetails) {
+      const isClassAttending = fieldOption.main === 'Class Attending' || name === 'Rider Level';
+
       fieldDetails.AllowedValues
         .map(value => value.Label)
         .filter(value => value && !value.includes('Equipment Only'))
@@ -197,7 +228,7 @@ function getData(event, storedOptions, fieldOptions, registrationsCurrent) {
                   const limit = storedOptions.data?.find(stored => option.includes(stored.option) && suboption.includes(stored.suboption))?.limit || '';
                   let registered = 0;
                   const regristrations = Object.keys(registrationsCurrent)
-                    .filter(current => current.includes(option) && current.includes(suboption));
+                    .filter(current => current.startsWith(`${name.split(' & ')[0]}: `) && current.includes(option) && current.includes(suboption));
 
                   regristrations.forEach(current => registered += registrationsCurrent[current]);
 
@@ -205,11 +236,37 @@ function getData(event, storedOptions, fieldOptions, registrationsCurrent) {
                 });
               }
             } else {
-              const suboption = '';
-              const limit = storedOptions.data?.find(stored => option.includes(stored.option))?.limit || '';
-              const registered = registrationsCurrent[option] || 0;
+              // For 2-day events with Class Attending/Rider Level, create separate rows for each day
+              if (is2DayEvent && isClassAttending) {
+                const daysToCheck = option.startsWith('P') ? ['Thursday'] : ['Wednesday', 'Thursday'];
 
-              dataOptions.push({ name, option, suboption, limit, registered });
+                daysToCheck.forEach(day => {
+                  const suboption = day;
+                  const limit = storedOptions.data?.find(stored =>
+                    option.includes(stored.option) && stored.suboption === day)?.limit || '';
+
+                  // Count registrations for this option on this specific day
+                  let registered = 0;
+                  Object.keys(registrationsCurrent).forEach(current => {
+                    if (current.startsWith(`${name}: `) && current.includes(option) && current.includes(day)) {
+                      registered += registrationsCurrent[current];
+                    }
+                  });
+
+                  dataOptions.push({ name, option, suboption, limit, registered });
+                });
+              } else {
+                const suboption = '';
+                const limit = storedOptions.data?.find(stored => option.includes(stored.option))?.limit || '';
+                let registered = 0;
+                Object.keys(registrationsCurrent).forEach(current => {
+                  if (current && current.startsWith(`${name}: `) && current.includes(option)) {
+                    registered += registrationsCurrent[current];
+                  }
+                });
+
+                dataOptions.push({ name, option, suboption, limit, registered });
+              }
             }
           }
         });
