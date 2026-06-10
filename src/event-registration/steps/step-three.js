@@ -344,8 +344,8 @@ function ticketTypeDependency() {
                 const span = item.querySelector('span.textLine');
 
                 if (
-                    (ticketType.includes('Practice') && !span.textContent.includes('Practice'))
-                    || (!ticketType.includes('Practice') && span.textContent.includes('Practice'))
+                    (ticketType.includes('Racer Practice') && !span.textContent.includes('Practice'))
+                    || (!ticketType.includes('Racer Practice') && span.textContent.includes('Practice'))
                     || (ticketType.includes('Full License') && span.textContent.includes('Racer'))
                 ) {
                     span.style.opacity = '0.5';
