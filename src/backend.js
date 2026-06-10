@@ -81,7 +81,6 @@ export async function fetchEventRegistrations(token, eventId) {
   try {
     const allRegistrations = [];
     let offset = 0;
-    const limit = 100;
 
     while (true) {
       const eventRegistrations = await fetch(`https://api.wildapricot.org/v2.2/accounts/${WILD_APRICOT_ACCOUNT_ID}/eventregistrations?eventId=${eventId}&$skip=${offset}`, {
@@ -93,7 +92,7 @@ export async function fetchEventRegistrations(token, eventId) {
 
       allRegistrations.push(...registrations);
 
-      if (registrations.length < limit) {
+      if (registrations.length < 99) {
         break;
       }
       offset += registrations.length;
