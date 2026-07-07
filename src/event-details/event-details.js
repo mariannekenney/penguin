@@ -17,19 +17,35 @@ function execute() {
 		.map(element => element.textContent.trim())
 		.some(label => label.includes('LTF'));
 
-  const options = Array.from(document.querySelectorAll('.registrationInfo li'));
-  const hasEarlyBird = options.map(item => item.querySelector('.regTypeLiLabel')?.textContent.trim()).some(label => label && label.includes('Early-Bird'));
+	const options = Array.from(document.querySelectorAll('.registrationInfo li'));
+	const labels = options.map(item => item.querySelector('.regTypeLiLabel')?.textContent.trim()).filter(Boolean);
+
+	// Base type with the price and "Early-Bird" stripped out, so we can tell whether a
+	// label has a same-type Early-Bird/non-Early-Bird sibling (e.g. "General Registration
+	// (LTF)" vs "General Registration (LTF Early-Bird)"). Labels with no sibling (e.g.
+	// "Upgrade to School (LTF Practice)") aren't part of an Early-Bird pair and shouldn't
+	// be filtered based on Early-Bird status at all.
+	const getBaseType = (label) => label.split('–')[0].replace(/Early-Bird/gi, '').replace(/[\s()]+/g, ' ').trim();
+
+	const baseTypeCounts = labels.reduce((counts, label) => {
+		const baseType = getBaseType(label);
+		counts[baseType] = (counts[baseType] || 0) + 1;
+		return counts;
+	}, {});
+
 	options.forEach(item => {
-    const label = item.querySelector('.regTypeLiLabel').textContent.trim();
+		const label = item.querySelector('.regTypeLiLabel').textContent.trim();
+		const isLTFLabel = label.includes('LTF');
+		const hasEarlyBirdPair = baseTypeCounts[getBaseType(label)] > 1;
 
 		if (isEarlyBird == undefined) {
 			item.style.display = 'none';
 		} else if (label !== 'Equipment Only') {
-			if (hasLTF && !label.includes('LTF')) {
+			if (hasLTF && !isLTFLabel) {
 				item.style.display = 'none';
 			}
 
-			if (hasEarlyBird && ((label.includes('Early-Bird') && !isEarlyBird) || (!label.includes('Early-Bird') && isEarlyBird))) {
+			if (hasEarlyBirdPair && ((label.includes('Early-Bird') && !isEarlyBird) || (!label.includes('Early-Bird') && isEarlyBird))) {
 				item.style.display = 'none';
 			}
 		}
