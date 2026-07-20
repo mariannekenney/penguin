@@ -53,8 +53,7 @@ function limitOptions() {
     const soldOutFields = [];
     const soldOutNames = [];
 
-    const endDateText = document.querySelector('.eventRegistrationInfoEndDate')?.textContent || '';
-    const is2DayEvent = endDateText.includes('-');
+    const is2DayEvent = eventLimits.some(item => item.suboption === 'Wednesday' || item.suboption === 'Thursday');
     
     const ticketType = document.querySelector('.eventRegistrationInfoRegistrationType .infoText')?.textContent || '';
     const userHasWed = ticketType.includes('Wednesday');
